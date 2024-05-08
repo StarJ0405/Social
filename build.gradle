@@ -46,4 +46,10 @@ tasks.named('test') {
 }
 bootJar {
 	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	exclude('META-INF/*.sf', 'META-INF/*.DSA') // 서명 정보 제외
+}
+
+task copyReactBuild(type: Copy) {
+	from('frontend/.next')
+	into('src/main/resources/static')
 }
