@@ -9,7 +9,7 @@ public enum UserRole {
     private String value;
 
     public String getValue() {
-        return "ROLE_" + this.name();
+        return this.name();
     }
     public static UserRole getUserRole(String role){
         for(UserRole userRole : values())

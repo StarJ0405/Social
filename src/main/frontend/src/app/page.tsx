@@ -1,10 +1,10 @@
 import Image from "next/image";
 import axios from 'axios';
-import Sidebar from './sidebar';
-import Login from './login';
+import Sidebar from '@/app/sidebar';
+import { redirect } from 'next/navigation';
 export default function Home() {
   if(true)
-        return (<main className="flex"><Login /></main>);
+        return redirect("/account/login");
   else
         return (
             <main className="flex">
