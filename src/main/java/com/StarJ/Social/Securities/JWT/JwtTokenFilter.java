@@ -1,6 +1,6 @@
-package com.StarJ.Social.Global.Securities.JWT;
+package com.StarJ.Social.Securities.JWT;
 
-import com.StarJ.Social.Global.Securities.UserSecurityService;
+import com.StarJ.Social.Securities.UserSecurityService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

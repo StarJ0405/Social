@@ -1,7 +1,7 @@
 package com.StarJ.Social.Domains;
 
 import com.StarJ.Social.DTOs.UserRequestDTO;
-import com.StarJ.Social.Global.Securities.UserRole;
+import com.StarJ.Social.Enums.UserRole;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

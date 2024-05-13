@@ -1,6 +1,6 @@
-package com.StarJ.Social.Global.Securities.OAuth.OAuthUserInfoes;
+package com.StarJ.Social.Securities.OAuth.OAuthUserInfoes;
 
-import com.StarJ.Social.Global.Securities.OAuth.OAuth2UserInfo;
+import com.StarJ.Social.Securities.OAuth.OAuth2UserInfo;
 
 import java.util.Map;
 

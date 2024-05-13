@@ -12,7 +12,7 @@ public class UserResponseDTO {
     private String email;
     private String phoneNumber;
     private String role;
-
+    private String profileImage;
     public UserResponseDTO(SiteUser user) {
         this.username = user.getUsername();
         this.nickname = user.getNickname();

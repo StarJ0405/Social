@@ -1,4 +1,4 @@
-package com.StarJ.Social.Global;
+package com.StarJ.Social.Configs;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

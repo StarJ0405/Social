@@ -5,25 +5,11 @@ import { redirect } from 'next/navigation';
 import { fetchUser } from '@/app/api/UserAPI';
 import Image from "next/image";
 
-function Profile() {
-    const [user, setUser] = useState({});
-    const ACCESS_TOKEN = typeof window === 'undefined' ? null :  localStorage.getItem('accessToken');
-    useEffect(() => {
-        if (ACCESS_TOKEN) {
-            fetchUser()
-            .then((response) => {
-                setUser(response);
-            }).catch((error) => {
-                console.log(error);
-            });
-        } else
-            redirect("/account/login");
-    }, [ACCESS_TOKEN]);
-    console.log(user);
+function Profile({user}:{user:any}) {
     return (
         <div className="avatar w-[44px] h-[44px]">
             <div className="w-24 rounded-full">
-                <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" alt="profile" />
+                <img src={user.profileImage!=null?user.profileImage:'/basic_profile.png'} alt="profile" />
             </div>
         </div>
     );
@@ -33,7 +19,6 @@ function More(){
             localStorage.clear();
             window.location.href = `/account/login`;
     }
-//     <div><button onClick={handleLogout}>logout</button></div>
     return (
         <div className="dropdown dropdown-top mt-auto">
           <div tabIndex="0" role="button" className="btn mb-3 w-full"><svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 m-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" /></svg>더 보기</div>
@@ -62,6 +47,19 @@ function Logo({isFold}:{isFold:boolean}){
 export default function Sidebar(){
     const [width, setWidth] = useState(0);
     const [isFold, setIsFold] = useState(false);
+    const [user, setUser] = useState({});
+    const ACCESS_TOKEN = typeof window === 'undefined' ? null :  localStorage.getItem('accessToken');
+    useEffect(() => {
+        if (ACCESS_TOKEN) {
+            fetchUser()
+            .then((response) => {
+                setUser(response);
+            }).catch((error) => {
+                console.log(error);
+            });
+        } else
+            redirect("/account/login");
+    }, [ACCESS_TOKEN]);
     useEffect(() => {
         const updateWidth = () => {
             setWidth(window.innerWidth);
@@ -86,7 +84,7 @@ export default function Sidebar(){
                     <Icon isFold={isFold} name="홈"/>
                 </a>
             </div>
-            <div className="search flex w-full h-[60px] pl-5 mb-3 items-center">
+            <div className="search flex w-full h-[60px] pl-5 mb-3 items-center cursor-pointer">
                 <Image src="/search.png" width={44} height={44} alt="search"/>
                 <Icon isFold={isFold} name="검색"/>
             </div>
@@ -106,13 +104,15 @@ export default function Sidebar(){
                      <Icon isFold={isFold} name="메시지"/>
                 </a>
             </div>
-            <div className="alarm flex w-full h-[60px] pl-5 mb-3 items-center">
+            <div className="alarm flex w-full h-[60px] pl-5 mb-3 items-center cursor-pointer">
                 <Image src="/alarm.png" width={44} height={44} alt="alarm"/>
                 <Icon isFold={isFold} name="알림"/>
             </div>
             <div className="profile flex w-full h-[60px] pl-5 mb-3 items-center">
-                <Profile/>
-                <Icon isFold={isFold} name="프로필"/>
+                <a href={'/'+user.username}>
+                    <Profile user={user}/>
+                    <Icon isFold={isFold} name="프로필"/>
+                </a>
             </div>
             <More />
         </div>

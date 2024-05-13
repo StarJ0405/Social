@@ -1,4 +1,4 @@
-package com.StarJ.Social.Global.Securities.OAuth;
+package com.StarJ.Social.Securities.OAuth;
 
 import java.util.Map;
 

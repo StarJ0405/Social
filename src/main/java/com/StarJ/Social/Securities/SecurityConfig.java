@@ -1,7 +1,8 @@
-package com.StarJ.Social.Global.Securities;
+package com.StarJ.Social.Securities;
 
-import com.StarJ.Social.Global.Securities.JWT.JwtTokenFilter;
-import com.StarJ.Social.Global.Securities.OAuth.PrincipalOauth2UserService;
+import com.StarJ.Social.Enums.UserRole;
+import com.StarJ.Social.Securities.JWT.JwtTokenFilter;
+import com.StarJ.Social.Securities.OAuth.PrincipalOauth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-package com.StarJ.Social.Global.Securities;
+package com.StarJ.Social.Securities;
 
 import com.StarJ.Social.Domains.SiteUser;
 import com.StarJ.Social.Repositories.UserRepository;

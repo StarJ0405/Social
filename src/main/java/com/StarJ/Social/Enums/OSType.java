@@ -1,4 +1,4 @@
-package com.StarJ.Social.Global;
+package com.StarJ.Social.Enums;
 
 import lombok.Getter;
 

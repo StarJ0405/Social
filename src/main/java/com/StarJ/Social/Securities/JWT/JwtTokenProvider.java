@@ -1,6 +1,6 @@
-package com.StarJ.Social.Global.Securities.JWT;
+package com.StarJ.Social.Securities.JWT;
 
-import com.StarJ.Social.Global.Securities.CustomUserDetails;
+import com.StarJ.Social.Securities.CustomUserDetails;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
 import org.springframework.beans.factory.annotation.Value;

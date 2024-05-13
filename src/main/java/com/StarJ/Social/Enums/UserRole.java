@@ -1,4 +1,4 @@
-package com.StarJ.Social.Global.Securities;
+package com.StarJ.Social.Enums;
 
 public enum UserRole {
     ADMIN,

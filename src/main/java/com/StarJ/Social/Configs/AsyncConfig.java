@@ -1,4 +1,4 @@
-package com.StarJ.Social.Global;
+package com.StarJ.Social.Configs;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;

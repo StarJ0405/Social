@@ -1,4 +1,4 @@
-package com.StarJ.Social.Global.Securities.OAuth;
+package com.StarJ.Social.Securities.OAuth;
 
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;

@@ -1,13 +1,13 @@
-package com.StarJ.Social.Global.Securities.OAuth;
+package com.StarJ.Social.Securities.OAuth;
 
 import com.StarJ.Social.Domains.SiteUser;
 import com.StarJ.Social.Repositories.UserRepository;
-import com.StarJ.Social.Global.Securities.OAuth.OAuthUserInfoes.FacebookUserInfo;
-import com.StarJ.Social.Global.Securities.OAuth.OAuthUserInfoes.GoogleUserInfo;
-import com.StarJ.Social.Global.Securities.OAuth.OAuthUserInfoes.KakaoUserInfo;
-import com.StarJ.Social.Global.Securities.OAuth.OAuthUserInfoes.NaverUserInfo;
-import com.StarJ.Social.Global.Securities.CustomUserDetails;
-import com.StarJ.Social.Global.Securities.UserRole;
+import com.StarJ.Social.Securities.OAuth.OAuthUserInfoes.FacebookUserInfo;
+import com.StarJ.Social.Securities.OAuth.OAuthUserInfoes.GoogleUserInfo;
+import com.StarJ.Social.Securities.OAuth.OAuthUserInfoes.KakaoUserInfo;
+import com.StarJ.Social.Securities.OAuth.OAuthUserInfoes.NaverUserInfo;
+import com.StarJ.Social.Securities.CustomUserDetails;
+import com.StarJ.Social.Enums.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
