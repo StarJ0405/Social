@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 @Component
@@ -17,15 +19,17 @@ public class JwtTokenProvider {
     private Long jwtAccessTokenExpirationTime;
     @Value("${jwt.refreshTokenExpirationTime}")
     private Long jwtRefreshTokenExpirationTime;
+
     // 토근 생성
     public String generateAccessToken(Authentication authentication) {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        Date expiryDate = new Date(new Date().getTime() + jwtAccessTokenExpirationTime);
+        long current = LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toInstant().toEpochMilli();
+        Date expiryDate = new Date(current + jwtAccessTokenExpirationTime);
         return Jwts.builder()
                 .setSubject(customUserDetails.getUsername())
                 .claim("user-phone", customUserDetails.getPhoneNumber())
                 .claim("user-email", customUserDetails.getEmail())
-                .setIssuedAt(new Date())
+                .setIssuedAt(new Date(current))
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, jwtSecretKey)
                 .compact();
@@ -33,16 +37,18 @@ public class JwtTokenProvider {
 
     public String generateRefreshToken(Authentication authentication) {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        Date expiryDate = new Date(new Date().getTime() + jwtRefreshTokenExpirationTime);
+        long current = LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toInstant().toEpochMilli();
+        Date expiryDate = new Date(current + jwtRefreshTokenExpirationTime);
         return Jwts.builder()
                 .setSubject(customUserDetails.getUsername())
                 .claim("user-phone", customUserDetails.getPhoneNumber())
                 .claim("user-email", customUserDetails.getEmail())
-                .setIssuedAt(new Date())
+                .setIssuedAt(new Date(current))
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, jwtSecretKey)
                 .compact();
     }
+
     // 토근 분석
     public String getUserPhoneFromToken(String token) {
         return Jwts.parser()
@@ -75,6 +81,7 @@ public class JwtTokenProvider {
                 .getBody()
                 .getExpiration();
     }
+
     // 유효성 검사
     public Boolean validateToken(String token) {
         try {

@@ -24,8 +24,6 @@ public class QSiteUser extends EntityPathBase<SiteUser> {
 
     public final QAuth auth;
 
-    public final StringPath contact = createString("contact");
-
     public final DateTimePath<java.time.LocalDateTime> createDate = createDateTime("createDate", java.time.LocalDateTime.class);
 
     public final StringPath email = createString("email");

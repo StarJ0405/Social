@@ -43,10 +43,6 @@ public class SecurityConfig {
                 .csrf((csrf) -> csrf //
                         .ignoringRequestMatchers(new AntPathRequestMatcher("/api/**"))//
                 ).authorizeHttpRequests(request -> request //
-                        .requestMatchers("/api/user/login", "/api/user/test", "/api/user/signup").//
-                                permitAll() //
-                        .requestMatchers("/api/user/**").//
-                                authenticated() //
                         .requestMatchers("/api/manager/**").//
                                 hasAnyRole(UserRole.ADMIN.name(), UserRole.MANAGER.name()) //
                         .requestMatchers("/api/admin/**").//

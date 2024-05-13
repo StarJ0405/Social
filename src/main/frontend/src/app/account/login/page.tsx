@@ -1,8 +1,8 @@
 "use client";
 import { useState,useEffect } from 'react';
 import Image from "next/image";
-import { login } from "@/app/Auth";
-import {Google_small, Kakao_small} from "@/app/OAuth";
+import { login } from "@/app/API/AuthAPI";
+import {Google_small, Kakao_small} from "@/app/API/OAuthAPI";
 export function ScreenList() {
     const create = () => {
         const result = [];
@@ -15,7 +15,7 @@ export function ScreenList() {
 }
 
 export function Screen({num}:{num:int}){
-    return <Image className={"z-1 absolute transition-opacity duration-1000 ease-in left-[30.6%] top-[26.2%] "+(num!=0?"opacity-0":"")} id={'screen'+num} src={"/screen"+num+".png"} width="284" height="450" alt="screen" />
+    return <Image className={"z-1 absolute transition-opacity duration-1000 ease-in left-[8.8%] top-[10.5%] "+(num!=0?"opacity-0":"")} id={'screen'+num} src={"/screen"+num+".png"} width="284" height="450" alt="screen" />
 }
 export default function Login(){
     const [screenNumber, setScreenNumber] = useState(0);
@@ -55,8 +55,10 @@ export default function Login(){
     return (
         <div className="h-screen w-full flex items-center">
             <div className="w-full h-4/5 flex justify-center items-center">
-                <Image src="/phone.png" width="340" height="580" alt="phone"/>
-                <ScreenList />
+                <div className="relative">
+                    <Image src="/phone.png" width="340" height="580" alt="phone"/>
+                    <ScreenList />
+                </div>
                 <div className="w-[380px] h-[580px] m-10">
                     <div className="border border-black w-full h-4/5 mb-5 flex flex-col items-center justify-center">
                         <Image src="/logo_big.png" width="200" height="100" alt="logo_big" className="m-10"/>

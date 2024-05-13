@@ -16,11 +16,11 @@ public class Auth {
     @Column(nullable = false)
     private String tokenType;
 
-    @Column(nullable = false)
+    @Column(nullable = false,length = 500)
     @Setter
     private String accessToken;
 
-    @Column(nullable = false)
+    @Column(nullable = false,length = 500)
     @Setter
     private String refreshToken;
 

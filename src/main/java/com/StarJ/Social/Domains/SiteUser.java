@@ -21,7 +21,6 @@ public class SiteUser {
     private String nickname;
     @Setter
     private String password;
-    private String contact;
     @Setter
     private String role;
     @Setter
@@ -40,11 +39,10 @@ public class SiteUser {
     }
 
     @Builder
-    public SiteUser(String username, String nickname, String password, String contact, String phoneNumber, String email, String provider, String providerId) {
+    public SiteUser(String username, String nickname, String password,  String phoneNumber, String email, String provider, String providerId) {
         this.username = username;
         this.nickname = nickname;
         this.password = password;
-        this.contact = contact;
         this.role = UserRole.USER.getValue();
         this.phoneNumber = phoneNumber;
         this.email = email;
@@ -57,7 +55,6 @@ public class SiteUser {
         this.username = requestDto.getUsername();
         this.nickname = requestDto.getNickname();
         this.email = requestDto.getEmail();
-        this.contact = requestDto.getContact();
         this.phoneNumber = requestDto.getPhoneNumber();
         this.password = requestDto.getPassword();
         return this;

@@ -10,7 +10,6 @@ public class UserResponseDTO {
     private String username;
     private String nickname;
     private String email;
-    private String contact;
     private String phoneNumber;
     private String role;
 
@@ -18,7 +17,6 @@ public class UserResponseDTO {
         this.username = user.getUsername();
         this.nickname = user.getNickname();
         this.email = user.getEmail();
-        this.contact = user.getContact();
         this.role = user.getRole();
         this.phoneNumber = user.getPhoneNumber();
     }

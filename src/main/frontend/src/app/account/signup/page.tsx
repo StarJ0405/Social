@@ -1,8 +1,8 @@
 "use client";
 import Image from "next/image";
 import { useState,useEffect } from 'react';
-import { signUp } from "@/app/Auth";
-import { Kakao_big,Google_big } from "@/app/OAuth";
+import { signUp } from "@/app/API/AuthAPI";
+import { Kakao_big,Google_big } from "@/app/API/OAuthAPI";
 export default function Signup(){
     const [values, setValues] = useState({
         username: "",

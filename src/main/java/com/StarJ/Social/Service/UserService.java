@@ -21,7 +21,6 @@ public class UserService {
                 .username(requestDTO.getUsername()) //
                 .nickname(requestDTO.getNickname()) //
                 .password(passwordEncoder.encode(requestDTO.getPassword())) //
-                .contact(requestDTO.getContact()) //
                 .phoneNumber(requestDTO.getPhoneNumber()) //
                 .email(requestDTO.getEmail())//
                 .build();

@@ -22,11 +22,19 @@ public class UserController {
         this.userService.signup(requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
+
     @GetMapping("/user")
     public ResponseEntity<?> findUser(@RequestHeader("Authorization") String accessToken) {
-        String username = this.jwtTokenProvider.getUsernameFromToken(accessToken.substring(7));
-        UserResponseDTO userResponseDto = this.userService.findById(username);
-        return ResponseEntity.status(HttpStatus.OK).body(userResponseDto);
+        if (accessToken != null && accessToken.length() > 7) {
+            String token = accessToken.substring(7);
+            if (this.jwtTokenProvider.validateToken(token)) {
+                String username = this.jwtTokenProvider.getUsernameFromToken(token);
+                UserResponseDTO userResponseDto = this.userService.findById(username);
+                return ResponseEntity.status(HttpStatus.OK).body(userResponseDto);
+            } else
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } else
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
     }
 
     @PutMapping("/user")
