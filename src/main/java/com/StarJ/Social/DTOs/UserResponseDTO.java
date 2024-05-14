@@ -13,11 +13,14 @@ public class UserResponseDTO {
     private String phoneNumber;
     private String role;
     private String profileImage;
+    private String description;
+
     public UserResponseDTO(SiteUser user) {
         this.username = user.getUsername();
         this.nickname = user.getNickname();
         this.email = user.getEmail();
         this.role = user.getRole();
         this.phoneNumber = user.getPhoneNumber();
+        this.description = user.getDescription();
     }
 }

@@ -24,15 +24,14 @@ public class UserController {
         this.userService.signup(requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
-
     @GetMapping("/data")
-    public ResponseEntity<?> getData(@RequestParam("username") String username) {
+    public ResponseEntity<?> getData(@RequestHeader("Username") String username) {
         try {
             UserResponseDTO userResponseDto = this.userService.findById(username);
             userResponseDto.setProfileImage(localFileService.getProfileImage(username));
             return ResponseEntity.status(HttpStatus.OK).body(userResponseDto);
         } catch (IllegalArgumentException ex) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+            return ResponseEntity.status(HttpStatus.OK).body(null);
         }
     }
 

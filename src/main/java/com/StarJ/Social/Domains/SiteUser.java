@@ -2,10 +2,7 @@ package com.StarJ.Social.Domains;
 
 import com.StarJ.Social.DTOs.UserRequestDTO;
 import com.StarJ.Social.Enums.UserRole;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,7 +30,8 @@ public class SiteUser {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE)
     private Auth auth;
-
+    @Setter
+    private String description;
     public SiteUser() {
         this.createDate = LocalDateTime.now();
     }
@@ -49,6 +47,7 @@ public class SiteUser {
         this.createDate = LocalDateTime.now();
         this.provider = provider;
         this.providerId = providerId;
+        this.description="안녕하세요~";
     }
 
     public SiteUser update(UserRequestDTO requestDto) {
@@ -57,6 +56,7 @@ public class SiteUser {
         this.email = requestDto.getEmail();
         this.phoneNumber = requestDto.getPhoneNumber();
         this.password = requestDto.getPassword();
+        this.description=requestDto.getDescription();
         return this;
     }
 }

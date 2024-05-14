@@ -9,7 +9,7 @@ function Profile({user}:{user:any}) {
     return (
         <div className="avatar w-[44px] h-[44px]">
             <div className="w-24 rounded-full">
-                <img src={user.profileImage!=null?user.profileImage:'/basic_profile.png'} alt="profile" />
+                <Image src={user.profileImage!=null?user.profileImage:'/commons/basic_profile.png'} width="24" height="24" alt="profile" />
             </div>
         </div>
     );
@@ -39,9 +39,9 @@ function Icon({isFold,name}:{isFold:boolean,name:string}){
 
 function Logo({isFold}:{isFold:boolean}){
     if(isFold)
-        return <Image src="/logo_small.png" width="44" height="44" alt="logo small"/>;
+        return <Image src="/commons/logo_small.png" width="44" height="44" alt="logo small"/>;
     else
-        return <Image src="/logo_big.png" width="100" height="50" alt="logo big"/>;
+        return <Image src="/commons/logo_big.png" width="100" height="50" alt="logo big"/>;
 }
 
 export default function Sidebar(){
@@ -70,7 +70,7 @@ export default function Sidebar(){
         return () => window.removeEventListener('resize', updateWidth);
     }, []);
     return (
-        <div className={'sidebar h-screen border-r-2 flex flex-col justify-start '+ (isFold?"w-[100px]" :'w-[220px]')}>
+        <div className={'sidebar h-screen border-r-2 flex flex-col justify-start '+ (isFold?"w-[120px]" :'w-[300px]')}>
             <div className="logo w-full h-[100px] pl-5 flex justify-start items-center">
                 <a href="/">
                     <Logo isFold={isFold}/>
@@ -78,19 +78,19 @@ export default function Sidebar(){
             </div>
             <div className="home flex w-full h-[60px] pl-5 mb-3 items-center">
                 <a href="/">
-                    <Image src="/home.png" width={44} height={44} alt="home" />
+                    <Image src="/commons/home.png" width={44} height={44} alt="home" />
                 </a>
                 <a href="/">
                     <Icon isFold={isFold} name="홈"/>
                 </a>
             </div>
             <div className="search flex w-full h-[60px] pl-5 mb-3 items-center cursor-pointer">
-                <Image src="/search.png" width={44} height={44} alt="search"/>
+                <Image src="/commons/search.png" width={44} height={44} alt="search"/>
                 <Icon isFold={isFold} name="검색"/>
             </div>
             <div className="explore flex w-full h-[60px] pl-5 mb-3 items-center">
                 <a href="/">
-                    <Image src="/explore.png" width={44} height={44} alt="explore"/>
+                    <Image src="/commons/explore.png" width={44} height={44} alt="explore"/>
                 </a>
                 <a href="/">
                     <Icon isFold={isFold} name="탐색"/>
@@ -98,15 +98,19 @@ export default function Sidebar(){
             </div>
             <div className="message flex w-full h-[60px] pl-5 mb-3 items-center">
                 <a href="/">
-                    <Image src="/message.png" width={44} height={44} alt="message" />
+                    <Image src="/commons/message.png" width={44} height={44} alt="message" />
                 </a>
                 <a href="/">
                      <Icon isFold={isFold} name="메시지"/>
                 </a>
             </div>
             <div className="alarm flex w-full h-[60px] pl-5 mb-3 items-center cursor-pointer">
-                <Image src="/alarm.png" width={44} height={44} alt="alarm"/>
+                <Image src="/commons/alarm.png" width={44} height={44} alt="alarm"/>
                 <Icon isFold={isFold} name="알림"/>
+            </div>
+             <div className="create flex w-full h-[60px] pl-5 mb-3 items-center cursor-pointer">
+                <Image src="/commons/create.png" width={44} height={44} alt="create"/>
+                <Icon isFold={isFold} name="만들기"/>
             </div>
             <div className="profile flex w-full h-[60px] pl-5 mb-3 items-center">
                 <a href={'/'+user.username}>

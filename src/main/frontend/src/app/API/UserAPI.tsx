@@ -1,11 +1,7 @@
-import axios from "axios";
+import {getAPI} from '@/app/API/axiosAPI';
 
-export const UserApi = axios.create({
-    baseURL: 'http://localhost:3000',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-});
+export const UserApi = getAPI();
+
 UserApi.interceptors.request.use(
     (config) => {
         const TOKEN_TYPE = localStorage.getItem("tokenType");

@@ -26,7 +26,6 @@ public class UserService {
                 .build();
         userRepository.save(user);
     }
-
     @Transactional
     public UserResponseDTO findById(String value) {
         SiteUser user = this.userRepository.find(value).orElseThrow(

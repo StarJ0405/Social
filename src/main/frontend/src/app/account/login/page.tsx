@@ -2,7 +2,7 @@
 import { useState,useEffect } from 'react';
 import Image from "next/image";
 import { login } from "@/app/API/AuthAPI";
-import {Google_small, Kakao_small} from "@/app/API/OAuthAPI";
+import {Google_small, Kakao_small} from "@/app/global/OAuth";
 export function ScreenList() {
     const create = () => {
         const result = [];
@@ -15,7 +15,7 @@ export function ScreenList() {
 }
 
 export function Screen({num}:{num:int}){
-    return <Image className={"z-1 absolute transition-opacity duration-1000 ease-in left-[8.8%] top-[10.5%] "+(num!=0?"opacity-0":"")} id={'screen'+num} src={"/screen"+num+".png"} width="284" height="450" alt="screen" />
+    return <Image className={"z-1 absolute transition-opacity duration-1000 ease-in left-[8.8%] top-[10.5%] "+(num!=0?"opacity-0":"")} id={'screen'+num} src={"/commons/screen"+num+".png"} width="284" height="450" alt="screen" />
 }
 export default function Login(){
     const [screenNumber, setScreenNumber] = useState(0);
@@ -56,12 +56,12 @@ export default function Login(){
         <div className="h-screen w-full flex items-center">
             <div className="w-full h-4/5 flex justify-center items-center">
                 <div className="relative">
-                    <Image src="/phone.png" width="340" height="580" alt="phone"/>
+                    <Image src="/commons/phone.png" width="340" height="580" alt="phone"/>
                     <ScreenList />
                 </div>
                 <div className="w-[380px] h-[580px] m-10">
                     <div className="border border-black w-full h-4/5 mb-5 flex flex-col items-center justify-center">
-                        <Image src="/logo_big.png" width="200" height="100" alt="logo_big" className="m-10"/>
+                        <Image src="/commons/logo_big.png" width="200" height="100" alt="logo_big" className="m-10"/>
                         <form onSubmit={handleSubmit}>
                             <label className="input input-bordered flex items-center gap-2 m-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 opacity-70"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z" /></svg>
