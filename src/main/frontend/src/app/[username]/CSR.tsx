@@ -18,9 +18,10 @@ export function Avatar({user} : {user:any}){
         }).then(response=> {
             setIsModalOpen(false);
             document.getElementById('profile_img').src=response.data;
-            console.log(response);
+            document.getElementById('mini_profile_img').src=response.data;
+
         })
-        .catch(error=>{alert('재시도 해주세요.');});
+        .catch(error=>{console.log(error);});
     }
 
     return (

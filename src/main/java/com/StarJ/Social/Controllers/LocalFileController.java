@@ -14,14 +14,14 @@ import org.springframework.web.multipart.MultipartFile;
 public class LocalFileController {
     private final JwtTokenProvider jwtTokenProvider;
     private final LocalFileService localFileService;
-    @PostMapping("/article")
-    public ResponseEntity<?> saveArticle(@RequestHeader("Authorization") String accessToken, MultipartFile file) {
+    @PostMapping("/temp_article")
+    public ResponseEntity<?> saveArticleTempImage(@RequestHeader("Authorization") String accessToken, MultipartFile file) {
         if (file != null && file.getContentType().toLowerCase().contains("image")) {
             if (accessToken != null && accessToken.length() > 7) {
                 String token = accessToken.substring(7);
                 if (this.jwtTokenProvider.validateToken(token)) {
                     String username = this.jwtTokenProvider.getUsernameFromToken(token);
-                    String filename= localFileService.saveProfileImage(username, file);
+                    String filename= localFileService.saveArticleTempImage(username, file);
                     return ResponseEntity.status(HttpStatus.OK).body(filename);
                 } else
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -30,8 +30,21 @@ public class LocalFileController {
         } else
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
     }
+    @DeleteMapping("/temp_article")
+    public ResponseEntity<?> deleteArticleTempImage(@RequestHeader("Authorization") String accessToken) {
+        if (accessToken != null && accessToken.length() > 7) {
+            String token = accessToken.substring(7);
+            if (this.jwtTokenProvider.validateToken(token)) {
+                String username = this.jwtTokenProvider.getUsernameFromToken(token);
+                localFileService.deleteArticleTempImage(username);
+                return ResponseEntity.status(HttpStatus.OK).body("deleted");
+            } else
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        } else
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    }
     @PostMapping("/profile")
-    public ResponseEntity<?> saveProfile(@RequestHeader("Authorization") String accessToken, MultipartFile file) {
+    public ResponseEntity<?> saveProfileImage(@RequestHeader("Authorization") String accessToken, MultipartFile file) {
         if (file != null && file.getContentType().toLowerCase().contains("image")) {
             if (accessToken != null && accessToken.length() > 7) {
                 String token = accessToken.substring(7);
@@ -47,12 +60,12 @@ public class LocalFileController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
     }
     @DeleteMapping("/profile")
-    public ResponseEntity<?> deleteProfile(@RequestHeader("Authorization") String accessToken){
+    public ResponseEntity<?> deleteProfileImage(@RequestHeader("Authorization") String accessToken){
         if (accessToken != null && accessToken.length() > 7) {
             String token = accessToken.substring(7);
             if (this.jwtTokenProvider.validateToken(token)) {
                 String username = this.jwtTokenProvider.getUsernameFromToken(token);
-                localFileService.deleteProfile(username);
+                localFileService.deleteProfileImage(username);
                 return ResponseEntity.status(HttpStatus.OK).body("deleted");
             } else
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);

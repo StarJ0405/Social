@@ -11,26 +11,27 @@ export default function Sidebar(){
     const [user, setUser] = useState({});
     const ACCESS_TOKEN = typeof window === 'undefined' ? null :  localStorage.getItem('accessToken');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
+    const [articleTempImage, setArticleTmepImage] = useState(null);
     const upload = async(e) => {
         const formData = new FormData();
         const file = e.target.files[0];
         formData.append("file",file);
         const ACCESS_TOKEN = typeof window === 'undefined' ? null :  localStorage.getItem('accessToken');
-        await UserApi.post('/api/file/article', formData, {
+        await UserApi.post('/api/file/temp_article', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
         }).then(response=> {
-
-
+            setArticleTmepImage(response.data);
         })
-        .catch(error=>{alert('재시도 해주세요.');});
+        .catch(error=>{console.log(error);});
     }
     function Profile() {
         return (
             <div className="avatar w-[44px] h-[44px]">
                 <div className="w-24 rounded-full">
-                    <img src={user.profileImage!=null?user.profileImage:'/commons/basic_profile.png'} className="w-[24px] h-[24px]" alt="profile" />
+                    <img id="mini_profile_img" src={user.profileImage!=null?user.profileImage:'/commons/basic_profile.png'} className="w-[24px] h-[24px]" alt="profile" />
                 </div>
             </div>
         );
@@ -45,7 +46,7 @@ export default function Sidebar(){
               <div tabIndex="0" role="button" className="btn mb-3 w-full"><svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 m-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" /></svg>더 보기</div>
               <ul tabIndex="0" className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
                 <li><a>설정</a></li>
-                <li><a>모드전환</a></li>
+                <li><a>모드 전환</a></li>
                 <li><a onClick={handleLogout}>로그아웃</a></li>
               </ul>
             </div>
@@ -128,15 +129,40 @@ export default function Sidebar(){
                     <Icon  name="만들기"/>
                 </a>
             </div>
-            <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)} className="flex flex-col w-[750px] h-[800px] justify-start items-center" escClose={true} outlineClose={true}>
-                <label className="font-bold text-lg w-full h-[24px] text-center mt-4">새 게시물 만들기</label>
-                <div className="divider m-1"></div>
-                <div className="flex h-full flex-col justify-center items-center font-bold text-2xl">
-                    <img src="/commons/picture.png" className="w-[96px] h-[96px] m-3"/>
-                    <label>사진과 동영상을 여기에 끌어다 놓으세요</label>
-                    <button className="btn btn-sm btn-info text-white m-3" onClick={()=>{document.getElementById('article_img').click();}}>컴퓨터에서 선택</button>
-                    <input id="article_img" type="file" className="hidden" onChange={upload}/>
-                </div>
+            <Modal open={isModalOpen} onClose={() => { if(articleTempImage==null) setIsModalOpen(false); else setIsArticleModalOpen(true); } } className="flex flex-col w-[750px] h-[800px] justify-start items-center" escClose={true} outlineClose={true}>
+
+                    {
+                    articleTempImage==null?
+                        (<>
+                            <label className="font-bold text-lg w-full h-[24px] text-center mt-4">새 게시물 만들기</label>
+                            <div className="divider m-1"></div>
+                            <div className="flex h-full flex-col justify-center items-center font-bold text-2xl">
+                                <img src="/commons/picture.png" className="w-[96px] h-[96px] m-3"/>
+                                <label>사진과 동영상을 여기에 끌어다 놓으세요</label>
+                                <button className="btn btn-sm btn-info text-white m-3" onClick={()=>{document.getElementById('article_img').click();}}>컴퓨터에서 선택</button>
+                                <input id="article_img" type="file" className="hidden" onChange={upload}/>
+                            </div>
+                        </>)
+                        :
+                        (<>
+                            <div className="flex justify-between w-full items-center">
+                                <label className="text-red-400 w-[40px] items-center mt-4 ml-4 cursor-pointer" onClick={() => setIsArticleModalOpen(true) }>취소</label>
+                                <Modal open={isArticleModalOpen} onClose={()=>setIsArticleModalOpen(false)} className="flex flex-col w-[400px] h-[200px] justify-center items-center" escClose={true} outlineClose={true}>
+                                    <label className="text-xl">게시물을 삭제하시겠어요?</label>
+                                    <label className="text-sm text-gray-500">지금 나가면 수정 내용이 저장되지 않습니다.</label>
+                                    <div className="divider m-1"></div>
+                                    <label className="text-red-500 cursor-pointer" onClick={()=>{setIsArticleModalOpen(false); setArticleTmepImage(null);}  }>삭제</label>
+                                    <div className="divider m-1"></div>
+                                    <label className="cursor-pointer" onClick={()=>{setIsArticleModalOpen(false);} }>취소</label>
+                                </Modal>
+                                <label className="font-bold text-lg w-full h-[24px] text-center mt-4">새 게시물 만들기</label>
+                                <label className="text-blue-400 w-[40px] mt-4 mr-4 cursor-pointer" onClick={()=>{setNext(true);}} >다음</label>
+                            </div>
+                            <div className="divider m-1"></div>
+                            <img src={articleTempImage} className="w-full h-full"/>
+                        </>)
+                    }
+
             </Modal>
             <div className="profile flex w-full h-[60px] pl-5 mb-3 items-center">
                 <a className="flex items-center" href={'/'+user.username}>

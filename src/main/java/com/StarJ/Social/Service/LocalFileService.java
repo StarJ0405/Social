@@ -51,7 +51,7 @@ public class LocalFileService {
         }
     }
 
-    public void deleteProfile(String username) {
+    public void deleteProfileImage(String username) {
         Optional<LocalFile> _localFile = localFileRepository.findById(LocalFileKeywords.profileImage.getValue(username));
         if (_localFile.isPresent()) {
             LocalFile localFile = _localFile.get();
@@ -64,4 +64,49 @@ public class LocalFileService {
         }
     }
 
+    public String getArticleTempImage(String username) {
+        Optional<LocalFile> _localFile = localFileRepository.findById(LocalFileKeywords.articleTempImage.getValue(username));
+        if (_localFile.isPresent())
+            return _localFile.get().getV();
+        else
+            return null;
+    }
+
+    public String saveArticleTempImage(String username, MultipartFile image) {
+        try {
+            Optional<LocalFile> _localFile = localFileRepository.findById(LocalFileKeywords.articleTempImage.getValue(username));
+            if (_localFile.isPresent()) {
+                LocalFile localFile = _localFile.get();
+                String path = SocialApplication.getOS_TYPE().getPath();
+                String filename = localFile.getV();
+                File file = new File(path + filename);
+                if (file.exists())
+                    file.delete();
+            }
+            String path = SocialApplication.getOS_TYPE().getPath();
+            String filename = "/users/" + username + "/" + UUID.randomUUID().toString() + "." + image.getContentType().split("/")[1];
+            File file = new File(path + filename);
+            if (!file.getParentFile().exists())
+                file.getParentFile().mkdirs();
+            image.transferTo(file);
+            LocalFile localFile = LocalFile.builder().k(LocalFileKeywords.articleTempImage.getValue(username)).v(filename).build();
+            localFileRepository.save(localFile);
+            return filename;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void deleteArticleTempImage(String username) {
+        Optional<LocalFile> _localFile = localFileRepository.findById(LocalFileKeywords.articleTempImage.getValue(username));
+        if (_localFile.isPresent()) {
+            LocalFile localFile = _localFile.get();
+            String path = SocialApplication.getOS_TYPE().getPath();
+            String filename = localFile.getV();
+            File file = new File(path + filename);
+            if (file.exists())
+                file.delete();
+            localFileRepository.delete(localFile);
+        }
+    }
 }
