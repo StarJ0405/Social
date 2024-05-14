@@ -1,22 +1,9 @@
 "use client";
 import { useState,useEffect } from 'react';
-import Image from "next/image";
 import { login } from "@/app/API/AuthAPI";
 import {Google_small, Kakao_small} from "@/app/global/OAuth";
-export function ScreenList() {
-    const create = () => {
-        const result = [];
-        for(let i=0; i<=9; i++){
-            result.push(<Screen key={i} num={i} />);
-        }
-        return result;
-    };
-    return (<div>{create()}</div>);
-}
 
-export function Screen({num}:{num:int}){
-    return <Image className={"z-1 absolute transition-opacity duration-1000 ease-in left-[8.8%] top-[10.5%] "+(num!=0?"opacity-0":"")} id={'screen'+num} src={"/commons/screen"+num+".png"} width="284" height="450" alt="screen" />
-}
+
 export default function Login(){
     const [screenNumber, setScreenNumber] = useState(0);
      const [values, setValues] = useState({
@@ -41,6 +28,18 @@ export default function Login(){
                  console.log(error);
              });
      }
+     function ScreenList() {
+         const create = () => {
+             const result = [];
+             for(let i=0; i<=9; i++){
+//                  result.push(<Screen key={i} num={i} />);
+                result.push(<img key={i} className={"z-1 absolute transition-opacity duration-1000 ease-in left-[8.8%] top-[10.5%] w-[284px] h-[450px] "+(i!=0?"opacity-0":"")} id={'screen'+i} src={"/commons/screen"+i+".png"} alt="screen" />);
+             }
+             return result;
+         };
+         return (<div>{create()}</div>);
+     }
+
     useEffect(() => {
         const timer = setInterval(()=>{
             const pre = document.getElementById('screen'+screenNumber);
@@ -56,12 +55,12 @@ export default function Login(){
         <div className="h-screen w-full flex items-center">
             <div className="w-full h-4/5 flex justify-center items-center">
                 <div className="relative">
-                    <Image src="/commons/phone.png" width="340" height="580" alt="phone"/>
+                    <img src="/commons/phone.png" className="w-[340px] h-[580px]" alt="phone"/>
                     <ScreenList />
                 </div>
                 <div className="w-[380px] h-[580px] m-10">
                     <div className="border border-black w-full h-4/5 mb-5 flex flex-col items-center justify-center">
-                        <Image src="/commons/logo_big.png" width="200" height="100" alt="logo_big" className="m-10"/>
+                        <img src="/commons/logo_big.png" className="w-[200px] h-[100px] m-10" alt="logo_big"/>
                         <form onSubmit={handleSubmit}>
                             <label className="input input-bordered flex items-center gap-2 m-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-4 h-4 opacity-70"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z" /></svg>

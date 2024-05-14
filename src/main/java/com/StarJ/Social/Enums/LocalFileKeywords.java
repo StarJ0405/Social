@@ -1,7 +1,7 @@
 package com.StarJ.Social.Enums;
 
 public enum LocalFileKeywords {
-    profileImage
+    profileImage,ArticleTempImage
     //
     ;
 

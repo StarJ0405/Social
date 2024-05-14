@@ -7,12 +7,13 @@ interface ModalProps {
   onClose: () => void;
   children: ReactNode;
 }
-const Modal = ({ open, onClose, children, className }: ModalProps) => {
+const Modal = ({ open, onClose, children, className, escClose, outlineClose }: ModalProps) => {
   if (!open) return null;
-  window.addEventListener("keydown", (e)=>{if(e.key =='Escape') onClose();});
+  if(escClose)
+    window.addEventListener("keydown", (e)=>{if(e.key =='Escape') onClose();});
   const portal = ReactDOM.createPortal(
     <>
-      <div className={styles.overlayStyle} onClick={onClose} />
+      <div className={styles.overlayStyle} onClick={outlineClose? onClose:null} />
       <div className={styles.modalStyle +' '+ className}>
         {children}
       </div>

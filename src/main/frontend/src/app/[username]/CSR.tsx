@@ -1,26 +1,28 @@
 "use client";
-import { fetchUser } from '@/app/api/UserAPI';
+import { fetchUser,UserApi } from '@/app/api/UserAPI';
 import { redirect } from 'next/navigation';
-import Image from "next/image";
 import Modal from "@/app/global/Modal"
 import { useState } from 'react';
-import {UserApi} from '@/app/API/UserApi';
 
-const upload = async(e) => {
-    const formData = new FormData();
-    const file = e.target.files[0];
-    formData.append("file",file);
-    const ACCESS_TOKEN = typeof window === 'undefined' ? null :  localStorage.getItem('accessToken');
-    await UserApi.post('/api/file/profile', formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data'
-        }
-    }).then(response=> { window.location.reload();})
-    .catch(error=>{alert('재시도 해주세요.');});
-
-}
 export function Avatar({user} : {user:any}){
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const upload = async(e) => {
+        const formData = new FormData();
+        const file = e.target.files[0];
+        formData.append("file",file);
+        const ACCESS_TOKEN = typeof window === 'undefined' ? null :  localStorage.getItem('accessToken');
+        await UserApi.post('/api/file/profile', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        }).then(response=> {
+            setIsModalOpen(false);
+            document.getElementById('profile_img').src=response.data;
+            console.log(response);
+        })
+        .catch(error=>{alert('재시도 해주세요.');});
+    }
+
     return (
         <>
             <a onClick={()=>{
@@ -34,9 +36,9 @@ export function Avatar({user} : {user:any}){
                 }else
                     redirect("/account/login");
             }}>
-                <Image width="200" height="200" src={user.profileImage!=null?user.profileImage:'/commons/basic_profile.png'} alt="profile" />
+                <img id="profile_img" className="w-[200px] h-[200px]" src={user.profileImage!=null?user.profileImage:'/commons/basic_profile.png'} alt="profile" />
             </a>
-            <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)} className="flex flex-col w-[400px] justify-center items-center">
+            <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)} className="flex flex-col w-[400px] justify-center items-center" escClose={true} outlineClose={true}>
                 <label className="mt-5 text-xl font-bold">프로필 사진 바꾸기</label>
                 <div className="divider m-1"></div>
                 <label className="text-sm font-bold text-blue-400 cursor-pointer" onClick={()=>{document.getElementById('file').click();} }>사진 업로드</label>

@@ -18,20 +18,15 @@ import java.util.UUID;
 public class LocalFileService {
     private final LocalFileRepository localFileRepository;
 
-    public void delete(String username) {
+    public String getProfileImage(String username) {
         Optional<LocalFile> _localFile = localFileRepository.findById(LocalFileKeywords.profileImage.getValue(username));
-        if (_localFile.isPresent()) {
-            LocalFile localFile = _localFile.get();
-            String path = SocialApplication.getOS_TYPE().getPath();
-            String filename = localFile.getV();
-            File file = new File(path + filename);
-            if (file.exists())
-                file.delete();
-            localFileRepository.delete(localFile);
-        }
+        if (_localFile.isPresent())
+            return _localFile.get().getV();
+        else
+            return null;
     }
 
-    public void saveProfileImage(String username, MultipartFile image) {
+    public String saveProfileImage(String username, MultipartFile image) {
         try {
             Optional<LocalFile> _localFile = localFileRepository.findById(LocalFileKeywords.profileImage.getValue(username));
             if (_localFile.isPresent()) {
@@ -50,16 +45,23 @@ public class LocalFileService {
             image.transferTo(file);
             LocalFile localFile = LocalFile.builder().k(LocalFileKeywords.profileImage.getValue(username)).v(filename).build();
             localFileRepository.save(localFile);
+            return filename;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public String getProfileImage(String username) {
+    public void deleteProfile(String username) {
         Optional<LocalFile> _localFile = localFileRepository.findById(LocalFileKeywords.profileImage.getValue(username));
-        if (_localFile.isPresent())
-            return _localFile.get().getV();
-        else
-            return null;
+        if (_localFile.isPresent()) {
+            LocalFile localFile = _localFile.get();
+            String path = SocialApplication.getOS_TYPE().getPath();
+            String filename = localFile.getV();
+            File file = new File(path + filename);
+            if (file.exists())
+                file.delete();
+            localFileRepository.delete(localFile);
+        }
     }
+
 }
