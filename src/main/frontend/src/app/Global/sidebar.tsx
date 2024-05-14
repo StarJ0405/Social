@@ -124,7 +124,7 @@ export default function Sidebar(){
                 <Icon  name="알림"/>
             </div>
             <div className="create flex w-full h-[60px] pl-5 mb-3 items-center cursor-pointer">
-                <a onClick={() => setIsModalOpen(true)} className="flex items-center">
+                <a onClick={() => { setIsModalOpen(true); setIsArticleModalOpen(false); } } className="flex items-center">
                     <img src="/commons/create.png" className="w-[44px] h-[44px]" alt="create"/>
                     <Icon  name="만들기"/>
                 </a>
@@ -159,7 +159,7 @@ export default function Sidebar(){
                                 <label className="text-blue-400 w-[40px] mt-4 mr-4 cursor-pointer" onClick={()=>{setNext(true);}} >다음</label>
                             </div>
                             <div className="divider m-1"></div>
-                            <img src={articleTempImage} className="w-full h-full"/>
+                            <img id="article_temp_img" src={articleTempImage} className="w-full h-full"/>
                         </>)
                     }
 

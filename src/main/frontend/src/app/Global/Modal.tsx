@@ -8,19 +8,18 @@ interface ModalProps {
   children: ReactNode;
 }
 const Modal = ({ open, onClose, children, className, escClose, outlineClose }: ModalProps) => {
-  if (!open) return null;
-  if(escClose)
-    window.addEventListener("keydown", (e)=>{if(e.key =='Escape') onClose();});
-  const portal = ReactDOM.createPortal(
-    <>
-      <div className={styles.overlayStyle} onClick={outlineClose? onClose:null} />
-      <div className={styles.modalStyle +' '+ className}>
-        {children}
-      </div>
-    </>,
-    document.getElementById("global-modal") as HTMLElement
-  );
-
+    if (!open) return null;
+    if(escClose)
+        window.addEventListener("keydown", (e)=>{if(e.key =='Escape') onClose();});
+    const portal = ReactDOM.createPortal(
+        <>
+          <div className={styles.overlayStyle} onClick={outlineClose? onClose:null} />
+          <div className={styles.modalStyle +' '+ className}>
+            {children}
+          </div>
+        </>,
+        document.getElementById("global-modal") as HTMLElement
+    );
   return portal;
 };
 
