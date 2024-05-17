@@ -1,4 +1,5 @@
-import React, { ReactNode } from "react";
+"use client";
+import React, { ReactNode, useEffect } from "react";
 import ReactDOM from "react-dom";
 import styles from "./Modal.module.scss";
 
@@ -6,14 +7,26 @@ interface ModalProps {
   open: boolean;
   onClose: () => void;
   children: ReactNode;
+  className: string;
+  escClose: boolean;
+  outlineClose: boolean;
 }
+
 const Modal = ({ open, onClose, children, className, escClose, outlineClose }: ModalProps) => {
+      useEffect(() => {
+        const onWindowKeydown = (e:any) => {
+          if(e.key =='Escape')
+              onClose();
+        };
+        if(escClose){
+          window.addEventListener('keydown', onWindowKeydown);
+          return () => window.removeEventListener('keydown', onWindowKeydown);
+        }
+      }, [escClose]);
     if (!open) return null;
-    if(escClose)
-        window.addEventListener("keydown", (e)=>{if(e.key =='Escape') onClose();});
     const portal = ReactDOM.createPortal(
         <>
-          <div className={styles.overlayStyle} onClick={outlineClose? onClose:null} />
+          <div className={styles.overlayStyle} onClick={() => {if(outlineClose) onClose();}} />
           <div className={styles.modalStyle +' '+ className}>
             {children}
           </div>

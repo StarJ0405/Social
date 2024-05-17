@@ -28,13 +28,13 @@ AuthApi.interceptors.response.use(
 );
 
 /** LOGIN API */
-export const login = async ({ username, password }) => {
+export const login = async ({ username, password }:{username:string,password:string} ) => {
     const data = { username, password };
     const response = await AuthApi.post(`/api/auth/login`, data);
     return response.data;
 }
 /** SIGNUP API */
-export const signUp = async ({ username, password, email, phoneNumber, nickname }) => {
+export const signUp = async ({ username, password, email, phoneNumber, nickname } :{username:string, password:string, email:string, phoneNumber:string, nickname:string}) => {
     const data = { username, password, email, phoneNumber, nickname };
     const response = await AuthApi.post(`/api/user/signup`, data);
     return response.data;

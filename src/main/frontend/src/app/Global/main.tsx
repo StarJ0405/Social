@@ -1,4 +1,4 @@
-import Sidebar from '@/app/global/sidebar';
+import Sidebar from '@/app/global/Sidebar';
 
 export default function Main({body} : {body:any}) {
 

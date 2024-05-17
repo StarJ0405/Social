@@ -10,12 +10,12 @@ export default function Login(){
             username: "",
             password: "",
      });
-     const handleChange = async (e) => {
+     const handleChange = async (e:any) => {
          setValues({...values,
              [e.target.id]: e.target.value,
          });
      }
-     const handleSubmit = async (e) => {
+     const handleSubmit = async (e:any) => {
             e.preventDefault();
              login(values)
              .then((response) => {
@@ -43,10 +43,12 @@ export default function Login(){
     useEffect(() => {
         const timer = setInterval(()=>{
             const pre = document.getElementById('screen'+screenNumber);
-            pre.classList.add('opacity-0');
+            if(pre)
+                pre.classList.add('opacity-0');
             const number = (screenNumber+1)%10;
             const now = document.getElementById('screen'+number);
-            now.classList.remove('opacity-0');
+            if(now)
+                now.classList.remove('opacity-0');
             setScreenNumber(number);
             clearInterval(timer);
         },4000);

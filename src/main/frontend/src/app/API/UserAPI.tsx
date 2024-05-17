@@ -47,7 +47,7 @@ export const fetchUser = async () => {
     return response.data;
 }
 /** 회원수정 API */
-export const updateUser = async (data) => {
+export const updateUser = async (data:any) => {
     const response = await UserApi.put(`/api/user/user`, data);
     return response.data;
 }
