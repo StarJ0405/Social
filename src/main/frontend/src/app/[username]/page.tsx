@@ -1,12 +1,11 @@
 import Main from '@/app/global/main';
-import {getAPI} from '@/app/API/axiosAPI';
-import {Avatar} from "./CSR"
+import {fetchUser} from '@/app/API/nonUserAPI';
+import {Avatar, List} from "./CSR"
 
-export default function Home({params}:{params:any}) {
+// fetchArticle
+export default async function Home({params}:{params:any}) {
     async function Profile() {
-        axios.defaults.headers.common['Username'] = params.username;
-        const response = await axios.get('/api/user/data');
-        const user = response.data;
+        const user = await fetchUser(params.username);
         if(user==null || user == "")
             return (
                 <div className="flex flex-col text-center">
@@ -41,13 +40,12 @@ export default function Home({params}:{params:any}) {
             );
     }
   const body =
-  (<div className="flex justify-center">
+  (<div className="w-full flex flex-col items-center justify-center">
         <Profile />
-        <div>
-        </div>
+        <div className='w-[80%] self-center divider'></div>
+        <List username={params.username}/>
   </div>);
   return (
        <Main body={body}/>
   );
 }
-const axios = getAPI();

@@ -1,9 +1,8 @@
 package com.StarJ.Social.Controllers;
 
-import com.StarJ.Social.Securities.JWT.JwtTokenProvider;
+import com.StarJ.Social.Service.AuthService;
 import com.StarJ.Social.Service.LocalFileService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,64 +11,52 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/file")
 @RequiredArgsConstructor
 public class LocalFileController {
-    private final JwtTokenProvider jwtTokenProvider;
+    private final AuthService authService;
     private final LocalFileService localFileService;
+
     @PostMapping("/temp_article")
     public ResponseEntity<?> saveArticleTempImage(@RequestHeader("Authorization") String accessToken, MultipartFile file) {
-        if (file != null && file.getContentType().toLowerCase().contains("image")) {
-            if (accessToken != null && accessToken.length() > 7) {
-                String token = accessToken.substring(7);
-                if (this.jwtTokenProvider.validateToken(token)) {
-                    String username = this.jwtTokenProvider.getUsernameFromToken(token);
-                    String filename= localFileService.saveArticleTempImage(username, file);
-                    return ResponseEntity.status(HttpStatus.OK).body(filename);
-                } else
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-            } else
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        AuthService.TokenReturnClass tokenReturnClass = authService.checkToken(accessToken);
+        if (tokenReturnClass.isOK() && file != null && file.getContentType().toLowerCase().contains("image")) {
+            String username = tokenReturnClass.username();
+            String filename = localFileService.saveArticleTempImage(username, file);
+            System.out.println("filename : "+filename);
+            return tokenReturnClass.getResponseEntity(filename);
         } else
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+            return tokenReturnClass.getResponseEntity();
     }
+
     @DeleteMapping("/temp_article")
     public ResponseEntity<?> deleteArticleTempImage(@RequestHeader("Authorization") String accessToken) {
-        if (accessToken != null && accessToken.length() > 7) {
-            String token = accessToken.substring(7);
-            if (this.jwtTokenProvider.validateToken(token)) {
-                String username = this.jwtTokenProvider.getUsernameFromToken(token);
-                localFileService.deleteArticleTempImage(username);
-                return ResponseEntity.status(HttpStatus.OK).body("deleted");
-            } else
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        AuthService.TokenReturnClass tokenReturnClass = authService.checkToken(accessToken);
+        if (tokenReturnClass.isOK()) {
+            String username = tokenReturnClass.username();
+            localFileService.deleteArticleTempImage(username);
+            return tokenReturnClass.getResponseEntity("deleted");
         } else
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+            return tokenReturnClass.getResponseEntity();
     }
+
     @PostMapping("/profile")
-    public ResponseEntity<?> saveProfileImage(@RequestHeader("Authorization") String accessToken, MultipartFile file) {
-        if (file != null && file.getContentType().toLowerCase().contains("image")) {
-            if (accessToken != null && accessToken.length() > 7) {
-                String token = accessToken.substring(7);
-                if (this.jwtTokenProvider.validateToken(token)) {
-                    String username = this.jwtTokenProvider.getUsernameFromToken(token);
-                    String filename= localFileService.saveProfileImage(username, file);
-                    return ResponseEntity.status(HttpStatus.OK).body(filename);
-                } else
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-            } else
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    public ResponseEntity<?> saveProfileImage(@RequestHeader("Authorization") String accessToken, MultipartFile
+            file) {
+        AuthService.TokenReturnClass tokenReturnClass = authService.checkToken(accessToken);
+        if (tokenReturnClass.isOK() && file != null && file.getContentType().toLowerCase().contains("image")) {
+            String username = tokenReturnClass.username();
+            String filename = localFileService.saveProfileImage(username, file);
+            return tokenReturnClass.getResponseEntity(filename);
         } else
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+            return tokenReturnClass.getResponseEntity();
     }
+
     @DeleteMapping("/profile")
-    public ResponseEntity<?> deleteProfileImage(@RequestHeader("Authorization") String accessToken){
-        if (accessToken != null && accessToken.length() > 7) {
-            String token = accessToken.substring(7);
-            if (this.jwtTokenProvider.validateToken(token)) {
-                String username = this.jwtTokenProvider.getUsernameFromToken(token);
-                localFileService.deleteProfileImage(username);
-                return ResponseEntity.status(HttpStatus.OK).body("deleted");
-            } else
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+    public ResponseEntity<?> deleteProfileImage(@RequestHeader("Authorization") String accessToken) {
+        AuthService.TokenReturnClass tokenReturnClass = authService.checkToken(accessToken);
+        if (tokenReturnClass.isOK()) {
+            String username = tokenReturnClass.username();
+            localFileService.deleteProfileImage(username);
+            return tokenReturnClass.getResponseEntity("deleted");
         } else
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+            return tokenReturnClass.getResponseEntity();
     }
 }

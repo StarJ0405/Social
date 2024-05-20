@@ -4,12 +4,17 @@ import com.StarJ.Social.DTOs.AuthRequestDTO;
 import com.StarJ.Social.DTOs.AuthResponseDTO;
 import com.StarJ.Social.Domains.Auth;
 import com.StarJ.Social.Domains.SiteUser;
+import com.StarJ.Social.Repositories.AuthRepository;
 import com.StarJ.Social.Repositories.UserRepository;
 import com.StarJ.Social.Securities.CustomUserDetails;
 import com.StarJ.Social.Securities.JWT.JwtTokenProvider;
-import com.StarJ.Social.Repositories.AuthRepository;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,17 +23,18 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final AuthRepository authRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
-    /** 로그인 */
+    /**
+     * 로그인
+     */
     @Transactional
     public AuthResponseDTO login(AuthRequestDTO requestDto) {
         // CHECK USERNAME AND PASSWORD
-        SiteUser user = this.userRepository.findById(requestDto.getUsername()).orElseThrow(
-                () -> new UsernameNotFoundException("해당 유저를 찾을 수 없습니다. username = " + requestDto.getUsername()));
+        SiteUser user = userService.getUser(requestDto.getUsername());
         if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다. username = " + requestDto.getUsername());
         }
@@ -57,7 +63,9 @@ public class AuthService {
     }
 
 
-    /** Token 갱신 */
+    /**
+     * Token 갱신
+     */
     @Transactional
     public String refreshToken(String refreshToken) {
         // CHECK IF REFRESH_TOKEN EXPIRATION AVAILABLE, UPDATE ACCESS_TOKEN AND RETURN
@@ -74,5 +82,35 @@ public class AuthService {
         // IF NOT AVAILABLE REFRESH_TOKEN EXPIRATION, REGENERATE ACCESS_TOKEN AND REFRESH_TOKEN
         // IN THIS CASE, USER HAVE TO LOGIN AGAIN, SO REGENERATE IS NOT APPROPRIATE
         return null;
+    }
+
+    public TokenReturnClass checkToken(String accessToken) {
+        HttpStatus httpStatus = HttpStatus.FORBIDDEN;
+        String username = null;
+        if (accessToken != null && accessToken.length() > 7) {
+            String token = accessToken.substring(7);
+            if (this.jwtTokenProvider.validateToken(token)) {
+                httpStatus = HttpStatus.OK;
+                username = this.jwtTokenProvider.getUsernameFromToken(token);
+            } else
+                httpStatus = HttpStatus.UNAUTHORIZED;
+        }
+        return TokenReturnClass.builder().httpStatus(httpStatus).username(username).build();
+    }
+
+    @Builder
+    public record TokenReturnClass(HttpStatus httpStatus, String username) {
+
+        public boolean isOK() {
+            return httpStatus.equals(HttpStatus.OK);
+        }
+
+        public ResponseEntity<?> getResponseEntity() {
+            return getResponseEntity(null);
+        }
+
+        public <T> ResponseEntity<T>  getResponseEntity(T body) {
+            return ResponseEntity.status(httpStatus).body(body);
+        }
     }
 }

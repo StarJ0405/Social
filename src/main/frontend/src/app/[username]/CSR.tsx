@@ -1,21 +1,18 @@
 "use client";
-import { fetchUser,UserApi } from '@/app/api/UserAPI';
+import { fetchUser,UserApi,saveProfile } from '@/app/api/UserAPI';
 import { redirect } from 'next/navigation';
 import Modal from "@/app/global/Modal"
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import {fetchArticleList} from '@/app/API/nonUserAPI';
 
-export function Avatar({user} : {user:any}){
+export function Avatar({user}:{user:any}){
     const [isModalOpen, setIsModalOpen] = useState(false);
     const upload = async(e:any) => {
         const formData = new FormData();
         const file = e.target.files[0];
         formData.append("file",file);
-        const ACCESS_TOKEN = typeof window === 'undefined' ? null :  localStorage.getItem('accessToken');
-        await UserApi.post('/api/file/profile', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        }).then(response=> {
+        saveProfile(formData)
+        .then(response=> {
             setIsModalOpen(false);
             const profile_img = document.getElementById('profile_img') as HTMLImageElement;
             if(profile_img)
@@ -23,7 +20,6 @@ export function Avatar({user} : {user:any}){
             const mini_profile_img = document.getElementById('mini_profile_img') as HTMLImageElement;
             if(mini_profile_img)
                 mini_profile_img.src=response.data;
-
         })
         .catch(error=>{console.log(error);});
     }
@@ -55,4 +51,20 @@ export function Avatar({user} : {user:any}){
             </Modal>
         </>
      );
+}
+
+export function List(user:any){
+    const[status] =useState(0);
+    const [page,setPage] = useState(0);
+    const[list,setList] = useState([] as any[]);
+    useEffect(()=>{
+        fetchArticleList({ username:user.username,page:page})
+        .then(response => setList(response))
+        .catch(error => console.log(error));
+    },[page]);
+    return (<>
+        {status==0?<div>
+        {list.map((article,index)=>(<div key={index}>{article.content}</div>))}    
+        </div> :<></>}
+    </>);
 }

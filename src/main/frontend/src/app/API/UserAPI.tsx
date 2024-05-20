@@ -1,4 +1,5 @@
 import {getAPI} from '@/app/API/axiosAPI';
+import exp from 'constants';
 
 export const UserApi = getAPI();
 
@@ -43,15 +44,44 @@ const refreshAccessToken = async () => {
 
 /** 회원조회 API */
 export const fetchUser = async () => {
-    const response = await UserApi.get(`/api/user/user`);
+    const response = await UserApi.get(`/api/user`);
     return response.data;
 }
 /** 회원수정 API */
 export const updateUser = async (data:any) => {
-    const response = await UserApi.put(`/api/user/user`, data);
+    const response = await UserApi.put(`/api/user`, data);
     return response.data;
 }
 /** 회원탈퇴 API */
 export const deleteUser = async () => {
-    await UserApi.delete(`/api/user/user`);
+    await UserApi.delete(`/api/user`);
+}
+interface articleProps{
+    content:string;
+    tags:String[];
+    visibility:number;
+    hideLoveAndShow:boolean;
+    preventComment:boolean;
+    img_url:string;
+}
+/** 프로필 저장 */
+export const saveProfile = async(formData:any) =>{
+    const response = await UserApi.post('/api/file/profile', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+    return response.data;
+}
+/** 게시글 임시 이미지 저장 */
+export const saveArticleTempImage = async( formData:any) => {
+    const response = await UserApi.post('/api/file/temp_article',formData,{headers: {
+        'Content-Type': 'multipart/form-data'
+    }});
+    return response.data;
+}
+/** 게시글 저장 */ 
+export const writeArticle = async(data:articleProps)=>{
+    const response = await UserApi.post('/api/article/write',data);
+    return response.data;
 }

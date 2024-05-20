@@ -1,14 +1,14 @@
 "use client";
 import { useState,useEffect } from 'react';
 import { redirect } from 'next/navigation';
-import { fetchUser,UserApi } from '@/app/api/UserAPI';
+import { fetchUser,saveArticleTempImage,writeArticle } from '@/app/api/UserAPI';
 import Modal from "@/app/global/Modal"
 import {EmoteDropDown} from "@/app/global/Emotes"
+
 export default function Sidebar(){
     const [width, setWidth] = useState(0);
     const [isFold, setIsFold] = useState(false);
     const [isDrag, setIsDrag] = useState(false);
-    const [count, setCount] = useState(0);
     const [isTagOpen, setIsTagOpen] = useState(false);
     const [isAdvanceOpen, setIsAdvanceOpen] = useState(false);
     const [user, setUser] = useState({
@@ -20,21 +20,23 @@ export default function Sidebar(){
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
     const [articleTempImage, setArticleTmepImage] = useState(null);
-    const [tags] = useState([] as String[]);
-    
-    const upload = async(e:any) => {
+    const [tags,setTags] = useState([] as String[]);
+    const [visibility, setVisibility] = useState(0);
+    const [hideLoveAndShow, setHideLoveAndShow] = useState(false);
+    const [preventComment, setPreventComment] = useState(false);
+    const [content, setContent] = useState("");
+    const upload = async(file:any) => {
         const formData = new FormData();
-        const file = e.target.files[0];
         formData.append("file",file);
-        const ACCESS_TOKEN = typeof window === 'undefined' ? null :  localStorage.getItem('accessToken');
-        await UserApi.post('/api/file/temp_article', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        }).then(response=> {
-            setArticleTmepImage(response.data);
-        })
-        .catch(error=>{console.log(error);});
+        setArticleTmepImage(await saveArticleTempImage(formData));
+        setIsDrag(false);
+        setContent("");
+        setIsTagOpen(false);
+        setIsAdvanceOpen(false);
+        setTags([] as String[]);
+        setHideLoveAndShow(false);
+        setPreventComment(false);
+        setVisibility(0);
     }
     function Profile() {
         return (
@@ -73,8 +75,6 @@ export default function Sidebar(){
         else
             return <span className="pl-3">{name}</span>;
     }
-    
-
     useEffect(() => {
         if (ACCESS_TOKEN) {
             fetchUser()
@@ -95,14 +95,7 @@ export default function Sidebar(){
         window.addEventListener('resize', updateWidth);
         return () => window.removeEventListener('resize', updateWidth);
     }, []);
-    useEffect(() => {
-        const updateCount = (e:any) => {
-            const value = e.target.value as string;
-            setCount(value?value.length:0);
-        };
-        window.addEventListener('keydown', updateCount);
-        return () => window.removeEventListener('keydown', updateCount);
-    }, []);
+
     return (
         <div className={'sidebar h-screen border-r-2 flex flex-col justify-start '+ (isFold?"w-[120px]" :'w-[300px]')}>
             <div className="logo w-full h-[100px] pl-5 flex justify-start items-center">
@@ -168,31 +161,16 @@ export default function Sidebar(){
                                     onDrop={(e)=>{
                                         e.preventDefault(); setIsDrag(false); 
                                         if (e.dataTransfer.items) {
-                                            if(e.dataTransfer.items.length==1){
-                                                const formData = new FormData();
-                                                const file = e.dataTransfer.items[0].getAsFile() as any;
-                                                formData.append("file",file);
-                                                const ACCESS_TOKEN = typeof window === 'undefined' ? null :  localStorage.getItem('accessToken');
-                                                UserApi.post('/api/file/temp_article', formData, {
-                                                    headers: {
-                                                        'Content-Type': 'multipart/form-data'
-                                                    }
-                                                }).then(response=> {
-                                                    setArticleTmepImage(response.data);
-                                                })
-                                                .catch(error=>{console.log(error);});
-                                                setIsDrag(false);
-                                                setCount(0);
-                                                setIsTagOpen(false);
-                                                setIsAdvanceOpen(false);
-                                            }else
+                                            if(e.dataTransfer.items.length==1)
+                                                upload(e.dataTransfer.items[0].getAsFile());
+                                            else
                                                 alert('파일을 한개만 올려주세요.');
                                         }
                                     }}>
                                         <img src="/commons/picture.png" className="w-[96px] h-[96px] m-3"/>
                                     <label>사진을 여기에 끌어다 놓으세요</label>
                                     <button className="btn btn-sm btn-info text-white m-3" onClick={()=>{const article_img = document.getElementById('article_img'); if(article_img) article_img.click();}}>컴퓨터에서 선택</button>
-                                    <input id="article_img" type="file" className="hidden" onChange={upload}/>
+                                    <input id="article_img" type="file" className="hidden" onChange={(e)=>{ if(e!=null&&e.target!=null&&e.target.files!=null)upload(e.target.files[0])}}/>
                                 </div>
                         </>)
                         :
@@ -200,7 +178,18 @@ export default function Sidebar(){
                             <div className="flex justify-between w-full items-center">
                                 <label className="text-red-400 w-[40px] items-center mt-4 ml-4 cursor-pointer" onClick={() => setIsArticleModalOpen(true) }>취소</label>
                                 <label className="font-bold text-lg w-full h-[24px] text-center mt-4">새 게시물 만들기</label>
-                                <label className="text-blue-400 w-[80px] mt-4 mr-4 cursor-pointer font-bold" onClick={()=>{}} >공유하기</label>
+                                <label className="text-blue-400 w-[80px] mt-4 mr-4 cursor-pointer font-bold" onClick={()=>{
+                                    console.log({
+                                        content,
+                                        tags,
+                                        visibility,
+                                        hideLoveAndShow,
+                                        preventComment,
+                                        articleTempImage
+                                    });
+                                  const response=  writeArticle({content,tags,visibility,hideLoveAndShow,preventComment,img_url:articleTempImage});
+                                  setIsModalOpen(false);
+                                }} >공유하기</label>
                             </div>
                             <div className="divider m-1"></div>
                             <div className="flex w-full">
@@ -211,21 +200,50 @@ export default function Sidebar(){
                                     </div>
                                     <div>
                                         <div className="flex flex-col">
-                                            <textarea id="text" className="w-full h-[200px] resize-none outline-none overflow-y-scroll" maxLength={2200} placeholder="문구를 입력하세요..."></textarea>
+                                            <textarea id="text" className="w-full h-[200px] resize-none outline-none overflow-y-scroll" maxLength={2200} placeholder="문구를 입력하세요..." onKeyDown={(e:any)=>{const value = e.target.value as string; setContent(value?value:"");}} onKeyUp={(e:any)=>{const value = e.target.value as string; setContent(value?value:"");}}></textarea>
                                             <div className="flex justify-between">
                                                 <EmoteDropDown input={document.getElementById('text') as HTMLInputElement} />
-                                                <label>{count}/2200</label> 
+                                                <label>{content.length}/2200</label> 
                                             </div>
                                         </div>
                                         <div className='divider m-1'></div>
                                         <div >
                                             <div className='w-full p-2'><a className='flex justify-between cursor-pointer' onClick={()=>setIsTagOpen(!isTagOpen)}><label className='cursor-pointer'>태그 설정</label><label className='cursor-pointer' >{isTagOpen? "▲":"▼"}</label></a></div>
-                                            {isTagOpen?  tags.map((tag, index) => (<button className='btn' key={index} >{tag}</button>)) :<></>}
-                                            {isTagOpen? <div className='p-2'><input type="text" id="tag" placeholder='태그 추가'/> <button className='cursor-pointer' onClick={()=>{const tag = document.getElementById('tag') as HTMLInputElement; if(tag&&tag.value){if(!tags.includes(tag.value))tags.push(tag.value); tag.value='';} }}>추가하기</button></div> : <></>}
+                                            {isTagOpen?
+                                                <>
+                                                    <div className='w-full p-2 flex flex-wrap'>
+                                                        {tags.map((tag, index) => (<button className='btn' key={index} onClick={()=>{const new_tags = [] as String[]; for(let i=0; i<tags.length;i++)if(tags[i]!=tag)new_tags.push(tags[i]); setTags(new_tags);}}>{tag}</button>))} 
+                                                    </div>
+                                                    <div className='w-full p-2'>
+                                                        <input type="text" id="tag" maxLength={30} placeholder='태그 추가'/>
+                                                        <button className='cursor-pointer' onClick={()=>{const tag = document.getElementById('tag') as HTMLInputElement; if(tag&&tag.value){if(!tags.includes(tag.value)){const new_tags = [] as String[]; new_tags.push(...tags); new_tags.push(tag.value); setTags(new_tags);} tag.value='';} }}>추가하기</button>
+                                                    </div>
+                                                </>
+                                            : <></>}
                                         </div>
                                         <div className='divider m-1'></div>
                                         <div>
-                                        <div className='w-full p-2'><a className='flex justify-between cursor-pointer' onClick={()=>setIsAdvanceOpen(!isAdvanceOpen)}><label className='cursor-pointer'>고급 설정</label><label className='cursor-pointer' >{isTagOpen? "▲":"▼"}</label></a></div>
+                                            <div className='w-full p-2'><a className='flex justify-between cursor-pointer' onClick={()=>setIsAdvanceOpen(!isAdvanceOpen)}><label className='cursor-pointer'>고급 설정</label><label className='cursor-pointer' >{isAdvanceOpen? "▲":"▼"}</label></a></div>
+                                            {isAdvanceOpen?
+                                                <>
+                                                    <div className='w-full p-2 flex justify-between items-center'>
+                                                        <label>공개 범위 설정</label>
+                                                        <select onChange={(e)=>setVisibility(e.target.value as unknown as number)} className='select select-bordered select-sm text-xs text-center w-[160px] max-w-xs'>
+                                                            <option value={0}>모두 공개</option>
+                                                            <option value={1}>팔로워에게 공개</option>
+                                                            <option value={2}>맞팔로워에게 공개</option>
+                                                            <option value={3}>친구에게 공개</option>
+                                                            <option value={4}>비공개</option>
+                                                        </select>
+                                                    </div>
+                                                    <div className='w-full p-2 flex items-center justify-between'>
+                                                        <label>좋아요 수 및 조회수 숨기기</label> <input type="checkbox" onChange={(e)=>{setHideLoveAndShow(e.target.checked)}} className="toggle" />
+                                                    </div>
+                                                    <div className='w-full p-2 flex items-center justify-between'>
+                                                        <label>댓글 기능 해제</label> <input type="checkbox" onChange={(e)=>{setPreventComment(e.target.checked)}} className="toggle" />                                                        
+                                                    </div>
+                                                </>
+                                            :<></>}
                                         </div>
                                     </div>
                                 </div>

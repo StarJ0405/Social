@@ -26,13 +26,15 @@ public class QArticle extends EntityPathBase<Article> {
 
     public final StringPath content = createString("content");
 
+    public final DateTimePath<java.time.LocalDateTime> createDate = createDateTime("createDate", java.time.LocalDateTime.class);
+
     public final BooleanPath hideLoveAndShow = createBoolean("hideLoveAndShow");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final BooleanPath preventComment = createBoolean("preventComment");
 
-    public final ListPath<String, StringPath> tags = this.<String, StringPath>createList("tags", String.class, StringPath.class, PathInits.DIRECT2);
+    public final SetPath<String, StringPath> tags = this.<String, StringPath>createSet("tags", String.class, StringPath.class, PathInits.DIRECT2);
 
     public final EnumPath<com.StarJ.Social.Enums.Visibility> visibility = createEnum("visibility", com.StarJ.Social.Enums.Visibility.class);
 
