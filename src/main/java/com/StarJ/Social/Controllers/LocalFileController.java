@@ -20,7 +20,6 @@ public class LocalFileController {
         if (tokenReturnClass.isOK() && file != null && file.getContentType().toLowerCase().contains("image")) {
             String username = tokenReturnClass.username();
             String filename = localFileService.saveArticleTempImage(username, file);
-            System.out.println("filename : "+filename);
             return tokenReturnClass.getResponseEntity(filename);
         } else
             return tokenReturnClass.getResponseEntity();

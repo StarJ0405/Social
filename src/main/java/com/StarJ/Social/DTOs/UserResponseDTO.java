@@ -5,6 +5,8 @@ import com.StarJ.Social.Domains.SiteUser;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class UserResponseDTO {
@@ -15,8 +17,10 @@ public class UserResponseDTO {
     private String role;
     private String description;
     private String profileImage;
+    private List<String> followers;
+    private List<String> followings;
 
-    public UserResponseDTO(SiteUser user, LocalFile file) {
+    public UserResponseDTO(SiteUser user, LocalFile file, List<String> followers, List<String> followings) {
         this.username = user.getUsername();
         this.nickname = user.getNickname();
         this.email = user.getEmail();
@@ -24,5 +28,7 @@ public class UserResponseDTO {
         this.phoneNumber = user.getPhoneNumber();
         this.description = user.getDescription();
         this.profileImage = file != null ? file.getV() : null;
+        this.followers = followers;
+        this.followings = followings;
     }
 }

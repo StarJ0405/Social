@@ -7,6 +7,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.text.DecimalFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Formatter;
 import java.util.List;
 
 @Getter
@@ -20,7 +25,7 @@ public class ArticleResponseDTO {
     private boolean hideLoveAndShow;
     private boolean preventComment;
     private String img_url;
-
+    private Long dateTime;
 
     public ArticleResponseDTO(Article article, LocalFile file) {
         this.id= article.getId();
@@ -30,6 +35,7 @@ public class ArticleResponseDTO {
         this.hideLoveAndShow = article.isHideLoveAndShow();
         this.preventComment = article.isPreventComment();
         this.img_url = file != null ? file.getV() : null;
+        this.dateTime = article.getCreateDate().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
     public void setTags(List<String> tags) {

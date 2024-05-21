@@ -3,7 +3,7 @@ import { useState,useEffect } from 'react';
 import { redirect } from 'next/navigation';
 import { fetchUser,saveArticleTempImage,writeArticle } from '@/app/api/UserAPI';
 import Modal from "@/app/global/Modal"
-import {EmoteDropDown} from "@/app/global/Emotes"
+import {EmoteDropDown,EmoteButton} from "@/app/global/Emotes"
 
 export default function Sidebar(){
     const [width, setWidth] = useState(0);
@@ -24,6 +24,7 @@ export default function Sidebar(){
     const [visibility, setVisibility] = useState(0);
     const [hideLoveAndShow, setHideLoveAndShow] = useState(false);
     const [preventComment, setPreventComment] = useState(false);
+    const [isOpen,setIsOpen] = useState(false);
     const [content, setContent] = useState("");
     const upload = async(file:any) => {
         const formData = new FormData();
@@ -187,7 +188,7 @@ export default function Sidebar(){
                                         preventComment,
                                         articleTempImage
                                     });
-                                  const response=  writeArticle({content,tags,visibility,hideLoveAndShow,preventComment,img_url:articleTempImage});
+                                  writeArticle({content,tags,visibility,hideLoveAndShow,preventComment,img_url:articleTempImage});
                                   setIsModalOpen(false);
                                 }} >공유하기</label>
                             </div>
@@ -201,8 +202,9 @@ export default function Sidebar(){
                                     <div>
                                         <div className="flex flex-col">
                                             <textarea id="text" className="w-full h-[200px] resize-none outline-none overflow-y-scroll" maxLength={2200} placeholder="문구를 입력하세요..." onKeyDown={(e:any)=>{const value = e.target.value as string; setContent(value?value:"");}} onKeyUp={(e:any)=>{const value = e.target.value as string; setContent(value?value:"");}}></textarea>
-                                            <div className="flex justify-between">
-                                                <EmoteDropDown input={document.getElementById('text') as HTMLInputElement} />
+                                            <div className="flex justify-between relative">
+                                                <EmoteButton open={isOpen} setIsOpen={(v:boolean)=>setIsOpen(v)} />
+                                                <EmoteDropDown input_id='text' position="top-[25px] left-[10px]" open={isOpen} setIsOpen={(v:boolean)=>setIsOpen(v) } />
                                                 <label>{content.length}/2200</label> 
                                             </div>
                                         </div>
@@ -215,8 +217,8 @@ export default function Sidebar(){
                                                         {tags.map((tag, index) => (<button className='btn' key={index} onClick={()=>{const new_tags = [] as String[]; for(let i=0; i<tags.length;i++)if(tags[i]!=tag)new_tags.push(tags[i]); setTags(new_tags);}}>{tag}</button>))} 
                                                     </div>
                                                     <div className='w-full p-2'>
-                                                        <input type="text" id="tag" maxLength={30} placeholder='태그 추가'/>
-                                                        <button className='cursor-pointer' onClick={()=>{const tag = document.getElementById('tag') as HTMLInputElement; if(tag&&tag.value){if(!tags.includes(tag.value)){const new_tags = [] as String[]; new_tags.push(...tags); new_tags.push(tag.value); setTags(new_tags);} tag.value='';} }}>추가하기</button>
+                                                        <input type="text" id="tag" maxLength={30} placeholder='태그 추가' onKeyDown={(e)=>{if(e.key=="Enter")document.getElementById("add_tag")?.click()}}/>
+                                                        <button id="add_tag" className='cursor-pointer' onClick={()=>{const tag = document.getElementById('tag') as HTMLInputElement; if(tag&&tag.value){if(!tags.includes(tag.value)){const new_tags = [] as String[]; new_tags.push(...tags); new_tags.push(tag.value); setTags(new_tags);} tag.value='';} }}>추가하기</button>
                                                     </div>
                                                 </>
                                             : <></>}

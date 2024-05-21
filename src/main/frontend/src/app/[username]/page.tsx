@@ -2,11 +2,14 @@ import Main from '@/app/global/main';
 import {fetchUser} from '@/app/API/nonUserAPI';
 import {Avatar, List} from "./CSR"
 
-// fetchArticle
+
 export default async function Home({params}:{params:any}) {
+    const user = await fetchUser(params.username);
+    function isUser(){
+        return user !=null && user.username == params.username;
+    }
     async function Profile() {
-        const user = await fetchUser(params.username);
-        if(user==null || user == "")
+        if(!user)
             return (
                 <div className="flex flex-col text-center">
                     <label className="text-2xl font-bold m-5 mt-[100px]">죄송합니다. 페이지를 사용할 수 없습니다.</label>
@@ -18,7 +21,7 @@ export default async function Home({params}:{params:any}) {
                 <div className="flex justify-center w-[80%] mt-5">
                     <div className="avatar w-[250px] h-[200px] flex justify-center cursor-pointer">
                         <div className="w-200 rounded-full">
-                            <Avatar user={user} />
+                            <Avatar user={user} isUser={isUser()} />
                         </div>
                     </div>
                     <div className="flex flex-col w-[30%]">
@@ -41,9 +44,11 @@ export default async function Home({params}:{params:any}) {
     }
   const body =
   (<div className="w-full flex flex-col items-center justify-center">
-        <Profile />
-        <div className='w-[80%] self-center divider'></div>
-        <List username={params.username}/>
+        <div className='w-[80%]'>
+            <Profile />
+            <div className='self-center divider'></div>
+            <List user={user} isUser={isUser()}/>
+        </div>
   </div>);
   return (
        <Main body={body}/>

@@ -23,7 +23,8 @@ public class JwtTokenProvider {
     // 토근 생성
     public String generateAccessToken(Authentication authentication) {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        long current = LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toInstant().toEpochMilli();
+        long current = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+                //.atZone(ZoneId.of("Asia/Seoul")).toInstant().toEpochMilli();
         Date expiryDate = new Date(current + jwtAccessTokenExpirationTime);
         return Jwts.builder()
                 .setSubject(customUserDetails.getUsername())
@@ -37,7 +38,7 @@ public class JwtTokenProvider {
 
     public String generateRefreshToken(Authentication authentication) {
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        long current = LocalDateTime.now().atZone(ZoneId.of("Asia/Seoul")).toInstant().toEpochMilli();
+        long current = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
         Date expiryDate = new Date(current + jwtRefreshTokenExpirationTime);
         return Jwts.builder()
                 .setSubject(customUserDetails.getUsername())

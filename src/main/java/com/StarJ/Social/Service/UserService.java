@@ -16,6 +16,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final LocalFileService localFileService;
+    private final FollowService followService;
 
     @Transactional
     public void signup(UserRequestDTO requestDTO) {
@@ -33,7 +34,7 @@ public class UserService {
     public UserResponseDTO findById(String value) {
         LocalFile file = localFileService.getProfileImage(value);
         SiteUser user = getUser(value);
-        return new UserResponseDTO(user, file);
+        return new UserResponseDTO(user, file, followService.getFollowers(user), followService.getFollowings(user));
     }
 
     @Transactional

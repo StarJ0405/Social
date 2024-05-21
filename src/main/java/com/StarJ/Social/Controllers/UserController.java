@@ -2,9 +2,7 @@ package com.StarJ.Social.Controllers;
 
 import com.StarJ.Social.DTOs.UserRequestDTO;
 import com.StarJ.Social.DTOs.UserResponseDTO;
-import com.StarJ.Social.Domains.LocalFile;
 import com.StarJ.Social.Service.AuthService;
-import com.StarJ.Social.Service.LocalFileService;
 import com.StarJ.Social.Service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

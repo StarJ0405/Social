@@ -5,12 +5,15 @@ import com.StarJ.Social.Enums.UserRole;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class SiteUser {
     @Id
     private String username;
@@ -32,10 +35,6 @@ public class SiteUser {
     private Auth auth;
     @Setter
     private String description;
-    public SiteUser() {
-        this.createDate = LocalDateTime.now();
-    }
-
     @Builder
     public SiteUser(String username, String nickname, String password,  String phoneNumber, String email, String provider, String providerId) {
         this.username = username;
