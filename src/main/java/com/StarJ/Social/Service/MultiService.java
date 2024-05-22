@@ -169,13 +169,16 @@ public class MultiService {
     }
 
     public ArticleResponseDTO getArticleResponseDTO(Article article) {
+        List<CommentResponseDTO> list =  this.commentService.getList(article.getId()).stream().map(c->c.toDTO(getUserResponseDTO(c.getUser()))).toList();
+
         return ArticleResponseDTO                                                                           //
                 .builder()                                                                                  //
                 .article(article)                                                                           //
                 .file(this.localFileService                                                                 //
-                        .getNullable(LocalFileKeywords.articleImage.getValue(article.getId().toString())))  //
-                .comments(this.commentService                                                               //
-                        .getList(article.getId()))                                                          //
+                        .getNullable(LocalFileKeywords                                                      //
+                                .articleImage                                                               //
+                                    .getValue(article.getId().toString())))                                 //
+                .comments(list)                                                                             //
                 .build();                                                                                   //
     }
 

@@ -1,6 +1,7 @@
 package com.StarJ.Social.Domains;
 
 import com.StarJ.Social.DTOs.CommentResponseDTO;
+import com.StarJ.Social.DTOs.UserResponseDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,7 +30,7 @@ public class Comment {
         this.comment = comment;
         this.createDate = LocalDateTime.now();
     }
-    public CommentResponseDTO toDTO(){
-        return CommentResponseDTO.builder().comment(this).build();
+    public CommentResponseDTO toDTO(UserResponseDTO userResponseDTO){
+        return CommentResponseDTO.builder().comment(this).userResponseDTO(userResponseDTO).build();
     }
 }

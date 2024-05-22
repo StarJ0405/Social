@@ -7,6 +7,7 @@ import DropDown from '../Global/DropDown';
 import { EmoteButton, EmoteDropDown } from '../global/Emotes';
 
 
+
 export function Avatar({user,isUser}:{user:any, isUser:boolean}){
     const [isModalOpen, setIsModalOpen] = useState(false);
     const upload = async(e:any) => {
@@ -56,6 +57,7 @@ export function List({user,isUser}:{user:any,isUser:boolean}){
     const [page,setPage] = useState(0);
     const[list,setList] = useState([] as any[]);
     
+
     useEffect(()=>{
         fetchArticleList({username:user.username,page:page})
         .then(response => setList(response))
@@ -83,6 +85,46 @@ export function List({user,isUser}:{user:any,isUser:boolean}){
             date.getFullYear() + "년 " + (date.getMonth()+1) + "월 " + date.getDate() + "일 " + date.getHours() + "시 " + date.getMinutes() + "분 " + date.getSeconds() + "초 " +  '일월화수목금토'.charAt(date.getUTCDay())+'요일'
         }</>;
     }
+    function Chat({url,nickname,content,dateTime}:{url:string,nickname:string,content:string,dateTime:number}){
+        const [isProfile,setIsProfile] = useState(false);
+        return (<>
+            <div className='p-2 flex relative'>
+                <img src={url} className='rounded-full w-[44px] h-[44px] cursor-pointer' onMouseOver={()=>setIsProfile(true)} onMouseLeave={()=>setIsProfile(false)} /> 
+                <div className='flex w-[456px] flex-col justify-center p-2 cursor-pointer'>
+                    <label className='font-bold cursor-pointer' onMouseOver={()=>setIsProfile(true)} onMouseLeave={()=>setIsProfile(false)}>{nickname}</label>
+                    <label className='w-[400px] break-words'>{content}</label>
+                    <label className='text-xs'><Days dateTime={dateTime}/> </label>
+                </div>
+                <DropDown open={isProfile} onClose={()=>setIsProfile(false)} className='w-[400px] h-[200px] bg-base-100 top-[55px] left-[8px] border '>
+                    <div className='flex flex-col'>
+                        <div className='flex items-center'>
+                            <img src={user.profileImage} className='rounded-full w-[66px] h-[66px]'/> 
+                            <div className='p-2 flex flex-col justify-center'>
+                                <label className='font-bold text-xl'>{user.username}</label>
+                                <label className='text-gray-500 text-sm'>{user.nickname}</label>
+                            </div>
+                        </div>
+                        <div className='flex justify-evenly items-center'>
+                            <div className='flex flex-col items-center justify-center'>
+                                <label>{list.length}</label>
+                                <label>게시물</label>
+                            </div>
+                            <div className='flex flex-col items-center justify-center'>
+                                <label>{user.followers.length}</label>
+                                <label>팔로워</label>
+                            </div>
+                            <div className='flex flex-col items-center justify-center'>
+                                <label>{user.followings.length}</label>
+                                <label>팔로잉</label>
+                            </div>
+                        </div>
+                    </div>
+                </DropDown>
+            </div>
+        </>);
+    }
+
+
     function Article({article,index}:{article:any,index:number}){
        const[over,setOver] = useState(-1);
        const[isModalOpen, setIsModalOpen] = useState(false);
@@ -102,44 +144,41 @@ export function List({user,isUser}:{user:any,isUser:boolean}){
                         </div>
                         <img src="/commons/more.png" className='p-2 w-[48px] h-[48px] cursor-pointer'/>
                         <DropDown open={isProfile} onClose={()=>setIsProfile(false)} className='w-[400px] h-[200px] bg-base-100 top-[7.5%] left-[2.5%] border '>
-                        <div className='flex flex-col'>
-                            <div className='flex items-center'>
-                                <img src={user.profileImage} className='rounded-full w-[66px] h-[66px]'/> 
-                                <div className='p-2 flex flex-col justify-center'>
-                                    <label className='font-bold text-xl'>{user.username}</label>
-                                    <label className='text-gray-500 text-sm'>{user.nickname}</label>
+                            <div className='flex flex-col'>
+                                <div className='flex items-center'>
+                                    <img src={user.profileImage} className='rounded-full w-[66px] h-[66px]'/> 
+                                    <div className='p-2 flex flex-col justify-center'>
+                                        <label className='font-bold text-xl'>{user.username}</label>
+                                        <label className='text-gray-500 text-sm'>{user.nickname}</label>
+                                    </div>
+                                </div>
+                                <div className='flex justify-evenly items-center'>
+                                    <div className='flex flex-col items-center justify-center'>
+                                        <label>{list.length}</label>
+                                        <label>게시물</label>
+                                    </div>
+                                    <div className='flex flex-col items-center justify-center'>
+                                        <label>{user.followers.length}</label>
+                                        <label>팔로워</label>
+                                    </div>
+                                    <div className='flex flex-col items-center justify-center'>
+                                        <label>{user.followings.length}</label>
+                                        <label>팔로잉</label>
+                                    </div>
                                 </div>
                             </div>
-                            <div className='flex justify-evenly items-center'>
-                                <div className='flex flex-col items-center justify-center'>
-                                    <label>{list.length}</label>
-                                    <label>게시물</label>
-                                </div>
-                                <div className='flex flex-col items-center justify-center'>
-                                    <label>{user.followers.length}</label>
-                                    <label>팔로워</label>
-                                </div>
-                                <div className='flex flex-col items-center justify-center'>
-                                    <label>{user.followings.length}</label>
-                                    <label>팔로잉</label>
-                                </div>
-                            </div>
-                        </div>
-                    </DropDown>
+                        </DropDown>
                     </div>
 
                     <div className='divider m-1'></div>
-                    <div className='flex flex-col w-full h-[650px]'>
-                        <div className='p-2 flex'>
-                            <img src={user.profileImage} className='rounded-full w-[44px] h-[44px]'/> 
-                            <div className='flex flex-col justift-center p-2'>
-                                <label onClick={()=>console.log(article)}>{user.nickname}</label>
-                                <label><Days dateTime={article.dateTime}/> </label>
+                    <div id="comments" className='flex flex-col w-full h-[650px] overflow-y-scroll'>
+                        <label className='pl-2'>{(article.tags as any[]).map((tag,index)=><a key={index} href="#" className='text-blue-500'>{'#'+tag}</a>) }</label>
+                        <Chat url={user.profileImage} nickname={user.nickname} content={article.content} dateTime={article.dateTime}  />
+                        {(article.comments as any[]).map((comment, index)=>(
+                            <div key={index}>
+                                <Chat url={comment.user.profileImage} nickname={comment.user.nickname} content={comment.comment} dateTime={comment.dateTime}/>
                             </div>
-                        </div>
-                        {
-                            
-                        }
+                        ))}
                     </div>
                     <div className='flex justify-between'>
                         <div className='flex'>
@@ -153,8 +192,8 @@ export function List({user,isUser}:{user:any,isUser:boolean}){
                     <EmoteDropDown input_id='text' open={isOpen} setIsOpen={(v:boolean)=>setIsOpen(v)} position='bottom-[50px] left-[10px]' onClick={()=>{const text = document.getElementById('text') as HTMLInputElement; if(text)setSubmitable(text.value.length>0); }}/>
                     <div className="p-2 flex">
                         <EmoteButton open={isOpen} setIsOpen={(v:boolean)=>setIsOpen(v)}/>
-                        <input className='w-[400px] p-2' type="text" id="text" placeholder='댓글 달기...' onKeyDown={(e)=>{if(e.key=="Enter") alert("submit"); setSubmitable((e.target as HTMLInputElement).value.length >0);}} onKeyUp={(e)=>{ setSubmitable((e.target as HTMLInputElement).value.length >0);} }/>
-                        <button disabled={!submitable} id="text_button" className={'p-2 text-center font-bold ' + (submitable?'text-blue-500':'text-gray-500')} onClick={()=>{ const text = (document.getElementById('text') as HTMLInputElement); writeComment({article_id: article.id, comment: text.value}); text.value=''; }} >게시</button>
+                        <input className='w-[400px] p-2' type="text" id="text" maxLength={255} placeholder='댓글 달기...' onKeyDown={(e)=>{if(e.key=="Enter") alert("submit"); setSubmitable((e.target as HTMLInputElement).value.length >0);}} onKeyUp={(e)=>{ setSubmitable((e.target as HTMLInputElement).value.length >0);} }/>
+                        <button disabled={!submitable} id="text_button" className={'p-2 text-center font-bold ' + (submitable?'text-blue-500':'text-gray-500')} onClick={()=>{ const text = (document.getElementById('text') as HTMLInputElement); writeComment({article_id: article.id, comment: text.value}); text.value='';}} >게시</button>
                     </div>
                 </div>
             </Modal>
@@ -162,7 +201,7 @@ export function List({user,isUser}:{user:any,isUser:boolean}){
     }
     return (<>
         {status==0?
-            <div className='flex flex-wrap justify-center'>
+            <div className='flex flex-wrap'>
                 {list.map((article,index)=>(
                     <div key={index} > 
                         <Article article={article} index={index} />
