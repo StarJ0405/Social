@@ -6,9 +6,7 @@ export default function Main({body} : {body:any}) {
        <main className="flex">
             <Sidebar/>
             <div className="main w-full overflow-y-auto">
-                <div className="content w-full min-h-[85%]">
                 {body}
-                </div>
                 <footer className="footer w-full h-[15%] footer-center p-10 bg-base-200 text-base-content rounded">
                   <nav className="grid grid-flow-col gap-4">
                     <a className="link link-hover">About us</a>

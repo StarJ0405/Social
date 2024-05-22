@@ -1,5 +1,6 @@
 package com.StarJ.Social.Domains;
 
+import com.StarJ.Social.DTOs.FollowResponseDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,4 +27,8 @@ public class Follow {
         this.follower = follower;
         this.createDate = LocalDateTime.now();
     }
+    public FollowResponseDTO toDTO(){
+        return FollowResponseDTO.builder().follow(this).build();
+    }
+
 }

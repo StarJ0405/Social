@@ -1,11 +1,14 @@
 package com.StarJ.Social.Repositories.Customs;
 
+import com.StarJ.Social.DTOs.FollowResponseDTO;
+import com.StarJ.Social.Domains.Follow;
+
 import java.util.List;
 
 public interface FollowCustomRepository {
-    List<String> getFollowers(String username);
+    List<Follow> getFollowers(String username);
 
-    List<String> getFollowing(String username);
+    List<Follow> getFollowing(String username);
 
-    List<String> getBothFollow(String username);
+    List<Follow> getBothFollow(String username);
 }

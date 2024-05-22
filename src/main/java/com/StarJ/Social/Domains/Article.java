@@ -27,6 +27,7 @@ public class Article {
     private boolean hideLoveAndShow;
     private boolean preventComment;
     private LocalDateTime createDate;
+    private LocalDateTime modifyDate;
     @Builder
     public Article(SiteUser author, String content, Set<String> tags, Visibility visibility, boolean hideLoveAndShow, boolean preventComment) {
         this.author = author;

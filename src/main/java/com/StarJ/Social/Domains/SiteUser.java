@@ -48,14 +48,4 @@ public class SiteUser {
         this.providerId = providerId;
         this.description="안녕하세요~";
     }
-
-    public SiteUser update(UserRequestDTO requestDto) {
-        this.username = requestDto.getUsername();
-        this.nickname = requestDto.getNickname();
-        this.email = requestDto.getEmail();
-        this.phoneNumber = requestDto.getPhoneNumber();
-        this.password = requestDto.getPassword();
-        this.description=requestDto.getDescription();
-        return this;
-    }
 }

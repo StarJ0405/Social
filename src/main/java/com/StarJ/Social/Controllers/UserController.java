@@ -2,8 +2,10 @@ package com.StarJ.Social.Controllers;
 
 import com.StarJ.Social.DTOs.UserRequestDTO;
 import com.StarJ.Social.DTOs.UserResponseDTO;
-import com.StarJ.Social.Service.AuthService;
-import com.StarJ.Social.Service.UserService;
+import com.StarJ.Social.Records.TokenRecord;
+import com.StarJ.Social.Service.Modules.AuthService;
+import com.StarJ.Social.Service.Modules.UserService;
+import com.StarJ.Social.Service.MultiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,19 +15,18 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
-    private final AuthService authService;
-    private final UserService userService;
+    private final MultiService multiService;
 
     @PostMapping("/signup")
     public ResponseEntity<?> singUp(@RequestBody UserRequestDTO requestDto) {
-        this.userService.signup(requestDto);
+        this.multiService.createUser(requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
     @GetMapping("/data")
     public ResponseEntity<?> getData(@RequestHeader("Username") String username) {
         try {
-            UserResponseDTO userResponseDto = this.userService.findById(username);
+            UserResponseDTO userResponseDto = this.multiService.getUserResponseDTO(username);
             return ResponseEntity.status(HttpStatus.OK).body(userResponseDto);
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.status(HttpStatus.OK).body(null);
@@ -34,33 +35,33 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<?> findUser(@RequestHeader("Authorization") String accessToken) {
-        AuthService.TokenReturnClass tokenReturnClass = authService.checkToken(accessToken);
-        if (tokenReturnClass.isOK()) {
-            String username = tokenReturnClass.username();
-            UserResponseDTO userResponseDto = this.userService.findById(username);
+        TokenRecord tokenRecord = this.multiService.checkToken(accessToken);
+        if (tokenRecord.isOK()) {
+            String username = tokenRecord.username();
+            UserResponseDTO userResponseDto = this.multiService.getUserResponseDTO(username);
             return ResponseEntity.status(HttpStatus.OK).body(userResponseDto);
         } else
-            return tokenReturnClass.getResponseEntity();
+            return tokenRecord.getResponseEntity();
     }
 
     @PutMapping
     public ResponseEntity<?> updateUser(@RequestHeader("Authorization") String accessToken,
                                         @RequestBody UserRequestDTO requestDto) {
-        AuthService.TokenReturnClass tokenReturnClass = authService.checkToken(accessToken);
-        if (tokenReturnClass.isOK()) {
-            String username = tokenReturnClass.username();
-            this.userService.update(username, requestDto);
+        TokenRecord tokenRecord = this.multiService.checkToken(accessToken);
+        if (tokenRecord.isOK()) {
+            String username = tokenRecord.username();
+            this.multiService.update(username, requestDto);
         }
-        return tokenReturnClass.getResponseEntity();
+        return tokenRecord.getResponseEntity();
     }
 
     @DeleteMapping
     public ResponseEntity<?> deleteUser(@RequestHeader("Authorization") String accessToken) {
-        AuthService.TokenReturnClass tokenReturnClass = authService.checkToken(accessToken);
-        if (tokenReturnClass.isOK()) {
-            String username = tokenReturnClass.username();
-            this.userService.delete(username);
+        TokenRecord tokenRecord = this.multiService.checkToken(accessToken);
+        if (tokenRecord.isOK()) {
+            String username = tokenRecord.username();
+            this.multiService.delete(username);
         }
-        return tokenReturnClass.getResponseEntity();
+        return tokenRecord.getResponseEntity();
     }
 }

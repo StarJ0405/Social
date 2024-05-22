@@ -6,7 +6,6 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class AuthResponseDTO {
     private String tokenType;
     private String accessToken;

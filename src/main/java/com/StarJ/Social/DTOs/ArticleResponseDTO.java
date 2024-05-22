@@ -3,15 +3,13 @@ package com.StarJ.Social.DTOs;
 import com.StarJ.Social.Domains.Article;
 import com.StarJ.Social.Domains.LocalFile;
 import com.StarJ.Social.Enums.Visibility;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Formatter;
 import java.util.List;
 
 @Getter
@@ -26,9 +24,11 @@ public class ArticleResponseDTO {
     private boolean preventComment;
     private String img_url;
     private Long dateTime;
+    private List<CommentResponseDTO> comments;
 
-    public ArticleResponseDTO(Article article, LocalFile file) {
-        this.id= article.getId();
+    @Builder
+    public ArticleResponseDTO(Article article, LocalFile file, List<CommentResponseDTO> comments) {
+        this.id = article.getId();
         this.content = article.getContent();
         this.tags = article.getTags().toArray(String[]::new);
         this.visibility = article.getVisibility().ordinal();
@@ -36,6 +36,7 @@ public class ArticleResponseDTO {
         this.preventComment = article.isPreventComment();
         this.img_url = file != null ? file.getV() : null;
         this.dateTime = article.getCreateDate().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        this.comments = comments;
     }
 
     public void setTags(List<String> tags) {
@@ -44,5 +45,9 @@ public class ArticleResponseDTO {
 
     public void setVisibility(Visibility visibility) {
         this.visibility = visibility.ordinal();
+    }
+
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 }

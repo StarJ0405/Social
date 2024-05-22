@@ -1,8 +1,11 @@
 package com.StarJ.Social.Controllers;
 
-import com.StarJ.Social.Service.AuthService;
-import com.StarJ.Social.Service.LocalFileService;
+import com.StarJ.Social.Records.TokenRecord;
+import com.StarJ.Social.Service.Modules.AuthService;
+import com.StarJ.Social.Service.Modules.LocalFileService;
+import com.StarJ.Social.Service.MultiService;
 import lombok.RequiredArgsConstructor;
+import org.antlr.v4.runtime.Token;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,51 +14,50 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/file")
 @RequiredArgsConstructor
 public class LocalFileController {
-    private final AuthService authService;
-    private final LocalFileService localFileService;
+  private final MultiService multiService;
 
     @PostMapping("/temp_article")
     public ResponseEntity<?> saveArticleTempImage(@RequestHeader("Authorization") String accessToken, MultipartFile file) {
-        AuthService.TokenReturnClass tokenReturnClass = authService.checkToken(accessToken);
-        if (tokenReturnClass.isOK() && file != null && file.getContentType().toLowerCase().contains("image")) {
-            String username = tokenReturnClass.username();
-            String filename = localFileService.saveArticleTempImage(username, file);
-            return tokenReturnClass.getResponseEntity(filename);
+        TokenRecord tokenRecord = multiService.checkToken(accessToken);
+        if (tokenRecord.isOK() && file != null && file.getContentType().toLowerCase().contains("image")) {
+            String username = tokenRecord.username();
+            String filename = multiService.saveArticleTempImage(username, file);
+            return tokenRecord.getResponseEntity(filename);
         } else
-            return tokenReturnClass.getResponseEntity();
+            return tokenRecord.getResponseEntity();
     }
 
     @DeleteMapping("/temp_article")
     public ResponseEntity<?> deleteArticleTempImage(@RequestHeader("Authorization") String accessToken) {
-        AuthService.TokenReturnClass tokenReturnClass = authService.checkToken(accessToken);
-        if (tokenReturnClass.isOK()) {
-            String username = tokenReturnClass.username();
-            localFileService.deleteArticleTempImage(username);
-            return tokenReturnClass.getResponseEntity("deleted");
+        TokenRecord tokenRecord = multiService.checkToken(accessToken);
+        if (tokenRecord.isOK()) {
+            String username = tokenRecord.username();
+            multiService.deleteArticleTempImage(username);
+            return tokenRecord.getResponseEntity("deleted");
         } else
-            return tokenReturnClass.getResponseEntity();
+            return tokenRecord.getResponseEntity();
     }
 
     @PostMapping("/profile")
     public ResponseEntity<?> saveProfileImage(@RequestHeader("Authorization") String accessToken, MultipartFile
             file) {
-        AuthService.TokenReturnClass tokenReturnClass = authService.checkToken(accessToken);
-        if (tokenReturnClass.isOK() && file != null && file.getContentType().toLowerCase().contains("image")) {
-            String username = tokenReturnClass.username();
-            String filename = localFileService.saveProfileImage(username, file);
-            return tokenReturnClass.getResponseEntity(filename);
+        TokenRecord tokenRecord = multiService.checkToken(accessToken);
+        if (tokenRecord.isOK() && file != null && file.getContentType().toLowerCase().contains("image")) {
+            String username = tokenRecord.username();
+            String filename = multiService.saveProfileImage(username, file);
+            return tokenRecord.getResponseEntity(filename);
         } else
-            return tokenReturnClass.getResponseEntity();
+            return tokenRecord.getResponseEntity();
     }
 
     @DeleteMapping("/profile")
     public ResponseEntity<?> deleteProfileImage(@RequestHeader("Authorization") String accessToken) {
-        AuthService.TokenReturnClass tokenReturnClass = authService.checkToken(accessToken);
-        if (tokenReturnClass.isOK()) {
-            String username = tokenReturnClass.username();
-            localFileService.deleteProfileImage(username);
-            return tokenReturnClass.getResponseEntity("deleted");
+        TokenRecord tokenRecord = multiService.checkToken(accessToken);
+        if (tokenRecord.isOK()) {
+            String username = tokenRecord.username();
+            multiService.deleteProfileImage(username);
+            return tokenRecord.getResponseEntity("deleted");
         } else
-            return tokenReturnClass.getResponseEntity();
+            return tokenRecord.getResponseEntity();
     }
 }

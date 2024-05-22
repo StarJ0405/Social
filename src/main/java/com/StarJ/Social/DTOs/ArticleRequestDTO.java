@@ -39,7 +39,4 @@ public class ArticleRequestDTO {
     public void setVisibility(int visibility) {
         this.visibility = Visibility.from(visibility);
     }
-    public Article.ArticleBuilder Articlebuilder(){
-        return Article.builder().content(content).tags(tags).visibility(visibility).hideLoveAndShow(hideLoveAndShow).preventComment(preventComment);
-    }
 }

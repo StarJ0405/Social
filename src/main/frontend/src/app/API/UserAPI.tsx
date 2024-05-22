@@ -56,14 +56,7 @@ export const updateUser = async (data:any) => {
 export const deleteUser = async () => {
     await UserApi.delete(`/api/user`);
 }
-interface articleProps{
-    content:string;
-    tags:String[];
-    visibility:number;
-    hideLoveAndShow:boolean;
-    preventComment:boolean;
-    img_url:string;
-}
+
 /** 프로필 저장 */
 export const saveProfile = async(formData:any) =>{
     const response = await UserApi.post('/api/file/profile', formData, {
@@ -73,6 +66,11 @@ export const saveProfile = async(formData:any) =>{
     })
     return response.data;
 }
+/** 프로필 삭제 */
+export const deleteProfile = async() =>{
+   const response = await  UserApi.delete('/api/file/profile');
+   return response.data;
+}
 /** 게시글 임시 이미지 저장 */
 export const saveArticleTempImage = async( formData:any) => {
     const response = await UserApi.post('/api/file/temp_article',formData,{headers: {
@@ -81,7 +79,25 @@ export const saveArticleTempImage = async( formData:any) => {
     return response.data;
 }
 /** 게시글 저장 */ 
+interface articleProps{
+    content:string;
+    tags:String[];
+    visibility:number;
+    hideLoveAndShow:boolean;
+    preventComment:boolean;
+    img_url:string;
+}
 export const writeArticle = async(data:articleProps)=>{
     const response = await UserApi.post('/api/article/write',data);
+    return response.data;
+}
+
+/** 댓글 작성 */
+interface commentProps{
+    article_id:number;
+    comment:string;
+}
+export const writeComment = async(data:commentProps)=>{
+    const response = await UserApi.post('/api/comment/write',data);
     return response.data;
 }

@@ -32,6 +32,8 @@ public class QArticle extends EntityPathBase<Article> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final DateTimePath<java.time.LocalDateTime> modifyDate = createDateTime("modifyDate", java.time.LocalDateTime.class);
+
     public final BooleanPath preventComment = createBoolean("preventComment");
 
     public final SetPath<String, StringPath> tags = this.<String, StringPath>createSet("tags", String.class, StringPath.class, PathInits.DIRECT2);

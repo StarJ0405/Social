@@ -43,8 +43,8 @@ export default async function Home({params}:{params:any}) {
             );
     }
   const body =
-  (<div className="w-full flex flex-col items-center justify-center">
-        <div className='w-[80%]'>
+  (<div className="w-full h-full flex flex-col items-center justify-start">
+        <div className='w-[1300px]'>
             <Profile />
             <div className='self-center divider'></div>
             <List user={user} isUser={isUser()}/>

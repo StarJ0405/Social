@@ -2,13 +2,16 @@ package com.StarJ.Social.DTOs;
 
 import com.StarJ.Social.Domains.LocalFile;
 import com.StarJ.Social.Domains.SiteUser;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class UserResponseDTO {
     private String username;
     private String nickname;
@@ -17,10 +20,11 @@ public class UserResponseDTO {
     private String role;
     private String description;
     private String profileImage;
-    private List<String> followers;
-    private List<String> followings;
+    private List<FollowResponseDTO> followers;
+    private List<FollowResponseDTO> followings;
 
-    public UserResponseDTO(SiteUser user, LocalFile file, List<String> followers, List<String> followings) {
+    @Builder
+    public UserResponseDTO(SiteUser user, LocalFile file, List<FollowResponseDTO> followers, List<FollowResponseDTO> followings) {
         this.username = user.getUsername();
         this.nickname = user.getNickname();
         this.email = user.getEmail();
