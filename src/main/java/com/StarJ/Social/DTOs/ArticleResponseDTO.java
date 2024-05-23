@@ -25,9 +25,9 @@ public class ArticleResponseDTO {
     private String img_url;
     private Long dateTime;
     private List<CommentResponseDTO> comments;
-
+    private List<String> lovers;
     @Builder
-    public ArticleResponseDTO(Article article, LocalFile file, List<CommentResponseDTO> comments) {
+    public ArticleResponseDTO(Article article, LocalFile file, List<CommentResponseDTO> comments, List<String> lovers) {
         this.id = article.getId();
         this.content = article.getContent();
         this.tags = article.getTags().toArray(String[]::new);
@@ -37,6 +37,7 @@ public class ArticleResponseDTO {
         this.img_url = file != null ? file.getV() : null;
         this.dateTime = article.getCreateDate().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
         this.comments = comments;
+        this.lovers=lovers;
     }
 
     public void setTags(List<String> tags) {

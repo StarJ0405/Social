@@ -9,5 +9,5 @@ import lombok.*;
 @AllArgsConstructor
 public class FollowRequestDTO {
     private String username;
-    private String follower_name;
+    private String follower;
 }

@@ -22,6 +22,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -33,6 +34,7 @@ public class MultiService {
     private final LocalFileService localFileService;
     private final CommentService commentService;
     private final FollowService followService;
+    private final LoveService loveService;
 
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -112,8 +114,9 @@ public class MultiService {
     public void update(String username, UserRequestDTO requestDto) {
         userService.update(username, requestDto.getNickname(), requestDto.getEmail(), requestDto.getPhoneNumber(), requestDto.getPassword(), requestDto.getDescription());
     }
+
     @Transactional
-    public void delete(String username){
+    public void delete(String username) {
         userService.delete(username);
     }
 
@@ -170,7 +173,7 @@ public class MultiService {
     }
 
     public ArticleResponseDTO getArticleResponseDTO(Article article) {
-        List<CommentResponseDTO> list =  this.commentService.getList(article.getId()).stream().map(c->c.toDTO(getUserResponseDTO(c.getUser()))).toList();
+        List<CommentResponseDTO> list = this.commentService.getList(article.getId()).stream().map(c -> c.toDTO(getUserResponseDTO(c.getUser()))).toList();
 
         return ArticleResponseDTO                                                                           //
                 .builder()                                                                                  //
@@ -178,8 +181,9 @@ public class MultiService {
                 .file(this.localFileService                                                                 //
                         .getNullable(LocalFileKeywords                                                      //
                                 .articleImage                                                               //
-                                    .getValue(article.getId().toString())))                                 //
+                                .getValue(article.getId().toString())))                                     //
                 .comments(list)                                                                             //
+                .lovers(loveService.getList(article))                                                       //
                 .build();                                                                                   //
     }
 
@@ -223,4 +227,33 @@ public class MultiService {
         return commentService.save(user, commentRequestDTO, article);
     }
 
+    /**
+     * Love
+     */
+    @Transactional
+    public boolean love(String username, Long articleId) {
+        SiteUser user = userService.get(username);
+        Article article = articleService.get(articleId);
+        Optional<Love> _love = loveService.getOptional(user,article);
+        if(_love.isPresent()){
+            loveService.delete(_love.get());
+            return false;
+        }else {
+            loveService.save(user, article);
+            return true;
+        }
+    }
+    @Transactional
+    public boolean follow(FollowRequestDTO requestDto) {
+        SiteUser user = userService.get(requestDto.getUsername());
+        SiteUser follower = userService.get(requestDto.getFollower());
+        Optional<Follow> _follow = followService.getOptional(user,follower);
+        if(_follow.isPresent()){
+            followService.delete(_follow.get());
+            return false;
+        }else {
+             followService.save(user, follower);
+             return true;
+        }
+    }
 }

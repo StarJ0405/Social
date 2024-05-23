@@ -1,10 +1,10 @@
 package com.StarJ.Social.Controllers;
 
+import com.StarJ.Social.DTOs.FollowRequestDTO;
 import com.StarJ.Social.DTOs.UserRequestDTO;
 import com.StarJ.Social.DTOs.UserResponseDTO;
+import com.StarJ.Social.Domains.Follow;
 import com.StarJ.Social.Records.TokenRecord;
-import com.StarJ.Social.Service.Modules.AuthService;
-import com.StarJ.Social.Service.Modules.UserService;
 import com.StarJ.Social.Service.MultiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -61,6 +61,15 @@ public class UserController {
         if (tokenRecord.isOK()) {
             String username = tokenRecord.username();
             this.multiService.delete(username);
+        }
+        return tokenRecord.getResponseEntity();
+    }
+
+    @PostMapping("/follow")
+    public ResponseEntity<?> follow(@RequestHeader("Authorization") String accessToken, @RequestBody FollowRequestDTO requestDto) {
+        TokenRecord tokenRecord = this.multiService.checkToken(accessToken);
+        if (tokenRecord.isOK()) {
+            this.multiService.follow(requestDto);
         }
         return tokenRecord.getResponseEntity();
     }

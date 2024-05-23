@@ -1,15 +1,15 @@
 import Main from '@/app/global/main';
-import {fetchArticleList, fetchUser} from '@/app/API/nonUserAPI';
-import {Avatar, List} from "./CSR"
+import { fetchnonUser} from '@/app/API/nonUserAPI';
+import {Avatar, List, Tool} from "./CSR"
 
 
 export default async function Home({params}:{params:any}) {
-    const user = await fetchUser(params.username);
+    const owner = await fetchnonUser(params.username);
     function isUser(){
-        return user !=null && user.username == params.username;
-    }   
+        return owner !=null && owner.username == params.username;
+    }  
     async function Profile() {
-        if(!user)
+        if(!owner)
             return (
                 <div className="flex flex-col text-center">
                     <label className="text-2xl font-bold m-5 mt-[100px]">죄송합니다. 페이지를 사용할 수 없습니다.</label>
@@ -21,22 +21,23 @@ export default async function Home({params}:{params:any}) {
                 <div className="flex justify-center w-[80%] mt-5">
                     <div className="avatar w-[250px] h-[200px] flex justify-center cursor-pointer">
                         <div className="w-200 rounded-full">
-                            <Avatar user={user} isUser={isUser()} />
+                            <Avatar user={owner} />
                         </div>
                     </div>
                     <div className="flex flex-col w-[30%]">
                         <div className="mb-5">
-                            <label className="mr-5">{user.username}</label>
-                            <button className="btn">프로필 편집</button>
+                            <label className="mr-5">{owner.username}</label>
+                            <Tool owner={owner}/>
+                             
                         </div>
                         <div className="mb-5">
-                            <label className="mr-5">게시물 {user.articleCount}</label>
-                            <label className="mr-5">팔로워 {user.followers.length}</label>
-                            <label className="mr-5">팔로우 {user.followings.length}</label>
+                            <label className="mr-5">게시물 {owner.articleCount}</label>
+                            <label className="mr-5">팔로워 {owner.followers.length}</label>
+                            <label className="mr-5">팔로우 {owner.followings.length}</label>
                         </div>
                         <div className="flex flex-col">
-                            <label className="text-xs font-bold">{user.nickname}</label>
-                            <label>{user.description}</label>
+                            <label className="text-xs font-bold">{owner.nickname}</label>
+                            <label>{owner.description}</label>
                         </div>
                     </div>
                 </div>
@@ -47,7 +48,7 @@ export default async function Home({params}:{params:any}) {
         <div className='w-[1236px]'>
             <Profile />
             <div className='self-center divider'></div>
-            <List user={user} isUser={isUser()}/>
+            <List user={owner}/>
         </div>
   </div>);
   return (

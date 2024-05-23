@@ -1,6 +1,5 @@
 package com.StarJ.Social.Domains;
 
-import com.StarJ.Social.DTOs.FollowResponseDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,25 +9,20 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Follow {
+public class Love {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter(AccessLevel.NONE)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY)
-    private SiteUser user; // 팔로우 당한 사람
+    private Article article;
     @ManyToOne(fetch = FetchType.LAZY)
-    private SiteUser follower; // 팔로우 한 사람
+    private SiteUser user;
     private LocalDateTime createDate;
-
     @Builder
-    public Follow(SiteUser user, SiteUser follower) {
+    public Love(Article article, SiteUser user) {
+        this.article = article;
         this.user = user;
-        this.follower = follower;
-        this.createDate = LocalDateTime.now();
+        this.createDate=LocalDateTime.now();
     }
-    public FollowResponseDTO toDTO() {
-        return FollowResponseDTO.builder().follow(this).build();
-    }
-
 }

@@ -101,3 +101,19 @@ export const writeComment = async(data:commentProps)=>{
     const response = await UserApi.post('/api/comment/write',data);
     return response.data;
 }
+interface LoveProps{
+    article_id:number;
+    username:string;
+}
+export const loveArticle = async(data:LoveProps)=>{
+    const response = await UserApi.post('/api/article/love',data);
+    return response.data;
+}
+interface FollwoProps{
+    username:string;
+    follower:string;
+}
+export const follow = async(data:FollwoProps)=>{
+    const response = await UserApi.post('/api/user/follow',data);
+    return response.data;
+}

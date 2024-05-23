@@ -1,19 +1,43 @@
-"use client";
-import { deleteProfile, fetchUser,saveProfile, writeComment } from '@/app/api/UserAPI';
-import Modal from "@/app/global/Modal"
+'use client';
+import { deleteProfile, fetchUser,follow,loveArticle,saveProfile, writeComment } from '@/app/api/UserAPI';
+import Modal from '@/app/global/Modal'
 import { useEffect, useState } from 'react';
 import {fetchArticleList} from '@/app/API/nonUserAPI';
 import DropDown, { Direcion } from '../Global/DropDown';
 import { EmoteButton, EmoteDropDown } from '../global/Emotes';
 
+export function Tool({owner}:{owner:any}){
+    const ACCESS_TOKEN = typeof window === 'undefined' ? null :  localStorage.getItem('accessToken');
+    const[user,setUser] = useState([]as any);
+    useEffect(()=>{
+        if (ACCESS_TOKEN) {
+            const response = fetchUser()
+                .then(response=>setUser(response))
+                .catch(e=>console.log(e));
+        }
+    }
+    ,[ACCESS_TOKEN]);
+    function isOwner(){
+        return user.username == owner.username;
+    }
+    // 팔로우 해제 기능 체크
+    return <>
+     {isOwner() ? 
+        <button className='btn'>프로필 편집</button>
+    :
+        (<>
+            <button className='btn' onClick={()=>follow({username:owner.username,follower:user.username})}>{ owner.followers.includes(user.username)? '팔로우 해제': '팔로우'}</button>
+            <button className='btn'>메시지 보내기</button>
+        </>)}
+    </>;
+}
 
-
-export function Avatar({user,isUser}:{user:any, isUser:boolean}){
+export function Avatar({user}:{user:any}){
     const [isModalOpen, setIsModalOpen] = useState(false);
     const upload = async(e:any) => {
         const formData = new FormData();
         const file = e.target.files[0];
-        formData.append("file",file);
+        formData.append('file',file);
         saveProfile(formData)
         .then(response=> {
             setIsModalOpen(false);
@@ -36,31 +60,31 @@ export function Avatar({user,isUser}:{user:any, isUser:boolean}){
                     }
                 );
             }}>
-                <img id="profile_img" className="w-[200px] h-[200px]" src={user.profileImage?user.profileImage:'/commons/basic_profile.png'} alt="profile" />
+                <img id='profile_img' className='w-[200px] h-[200px]' src={user.profileImage?user.profileImage:'/commons/basic_profile.png'} alt='profile' />
             </a>
-            <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)} className="flex flex-col w-[400px] justify-center items-center" escClose={true} outlineClose={true}>
-                <label className="mt-5 text-xl font-bold">프로필 사진 바꾸기</label>
-                <div className="divider m-1"></div>
-                <label className="text-sm font-bold text-blue-400 cursor-pointer" onClick={()=>{const file = document.getElementById('file'); if(file)file.click();} }>사진 업로드</label>
-                <input id="file" type="file" className="hidden" onChange={upload}/>
-                <div className="divider m-1"></div>
-                <label className="text-sm font-bold text-red-500 cursor-pointer" onClick={()=>{deleteProfile().then(response =>window.location.reload()).catch(error=>console.log(error))  }}>현재 사진 삭제</label>
-                <div className="divider m-1"></div>
-                <button className="mb-2" onClick={() => setIsModalOpen(false)}>취소</button>
+            <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)} className='flex flex-col w-[400px] justify-center items-center' escClose={true} outlineClose={true}>
+                <label className='mt-5 text-xl font-bold'>프로필 사진 바꾸기</label>
+                <div className='divider m-1'></div>
+                <label className='text-sm font-bold text-blue-400 cursor-pointer' onClick={()=>{const file = document.getElementById('file'); if(file)file.click();} }>사진 업로드</label>
+                <input id='file' type='file' className='hidden' onChange={upload}/>
+                <div className='divider m-1'></div>
+                <label className='text-sm font-bold text-red-500 cursor-pointer' onClick={()=>{deleteProfile().then(response =>window.location.reload()).catch(error=>console.log(error))  }}>현재 사진 삭제</label>
+                <div className='divider m-1'></div>
+                <button className='mb-2' onClick={() => setIsModalOpen(false)}>취소</button>
             </Modal>
         </>
      );
 }
 
-export function List({user,isUser}:{user:any,isUser:boolean}){
+export function List({user}:{user:any}){
     const[status,setStatus] =useState(0);
     const[page,setPage] = useState(0);
     const[list,setList] = useState([] as any[]);
     const[over,setOver] = useState(-1);
-    const[hoverDropDown, setHoverDropDown] = useState({user:{} as any, bg:"",b:""});
+    const[hoverDropDown, setHoverDropDown] = useState({user:{} as any, bg:'',b:''});
     const[submitable, setSubmitable] = useState(false);
     const[isOpen, setIsOpen] = useState(false);
-    const[article,setArticle] = useState({id:-1,img_url:"", tags:[]as any[], comments: [] as any[], content:"", dateTime:0});
+    const[article,setArticle] = useState({id:-1,img_url:'', tags:[]as any[], comments: [] as any[], content:'', dateTime:0, lovers:[] as string[]});
     const[timer, setTimer] = useState([] as any);
     useEffect(()=>{
         fetchArticleList({username:user.username,page:page})
@@ -69,24 +93,24 @@ export function List({user,isUser}:{user:any,isUser:boolean}){
     },[page]);
     function Days({dateTime}:{dateTime:number}){
         const result = (new Date().getTime()- dateTime)/1000;
-        let msg = "";
+        let msg = '';
         if(result < 60)
-            msg= Math.floor(result)+"초 전";
+            msg= Math.floor(result)+'초 전';
         else if( result < 60*60)
-            msg= Math.floor(result/60)+"분 전";
+            msg= Math.floor(result/60)+'분 전';
         else if(result < 60*60*24)
-            msg= Math.floor(result/60/60)+"시간 전";
+            msg= Math.floor(result/60/60)+'시간 전';
         else if(result < 60*60*24/14)
-            msg= Math.floor(result/60/60/24)+"일 전";
+            msg= Math.floor(result/60/60/24)+'일 전';
         else 
-            msg= Math.floor(result/60/60/24/7)+"주 전";
+            msg= Math.floor(result/60/60/24/7)+'주 전';
         return <> {msg} </>;
     }
 
     function GetDate({dateTime}:{dateTime:number}){
         const date = new Date(dateTime);
         return <>{
-            date.getFullYear() + "년 " + (date.getMonth()+1) + "월 " + date.getDate() + "일 " + date.getHours() + "시 " + date.getMinutes() + "분 " + date.getSeconds() + "초 " +  '일월화수목금토'.charAt(date.getUTCDay())+'요일'
+            date.getFullYear() + '년 ' + (date.getMonth()+1) + '월 ' + date.getDate() + '일 ' + date.getHours() + '시 ' + date.getMinutes() + '분 ' + date.getSeconds() + '초 ' +  '일월화수목금토'.charAt(date.getUTCDay())+'요일'
         }</>;
     }
     function refresh(){
@@ -103,7 +127,7 @@ export function List({user,isUser}:{user:any,isUser:boolean}){
         closeHoverDropDown();
     }
     function closeArticle(){
-        setArticle({id:-1, img_url:"", tags:[]as any[], comments: [] as any[], content:"", dateTime:0});
+        setArticle({id:-1, img_url:'', tags:[]as any[], comments: [] as any[], content:'', dateTime:0,lovers:[] as string[]});
     }
     function openHoverDropDown(user:any, bg:string,b:string){
         setHoverDropDown({user:user, bg:bg,b:b});
@@ -113,7 +137,7 @@ export function List({user,isUser}:{user:any,isUser:boolean}){
         }
     }
     function closeHoverDropDown(){
-        const timer = setInterval(()=>{setHoverDropDown({user:{} as any, bg:"",b:""}); clearInterval(timer);setTimer([]as any);},200);
+        const timer = setInterval(()=>{setHoverDropDown({user:{} as any, bg:'',b:''}); clearInterval(timer);setTimer([]as any);},200);
         setTimer(timer);
     }
     return (<>
@@ -128,13 +152,13 @@ export function List({user,isUser}:{user:any,isUser:boolean}){
                         <img src={article.img_url} className='w-[900px] h-[900px]'/>
                         <div id='pbg-1' className='flex flex-col w-full relative'>
                             <div className='w-full flex justify-between p-2'>
-                                <div id='pb-1' className='flex items-center cursor-pointer' onMouseEnter={()=>openHoverDropDown(user,"pbg-1","pb-1")} onMouseLeave={()=>closeHoverDropDown()}>
+                                <div id='pb-1' className='flex items-center cursor-pointer' onMouseEnter={()=>openHoverDropDown(user,'pbg-1','pb-1')} onMouseLeave={()=>closeHoverDropDown()}>
                                     <img src={user.profileImage} className='w-[44px] h-[44px] rounded-full cursor-pointer' alt={user.username}/>
                                     <label className='p-2 cursor-pointer hover:text-gray-400 font-bold'>{user.username}</label>
                                 </div>
-                                <img src="/commons/more.png" className='p-2 w-[48px] h-[48px] cursor-pointer'/>
+                                <img src='/commons/more.png' className='p-2 w-[48px] h-[48px] cursor-pointer'/>
                             </div>
-                            <DropDown open={hoverDropDown.bg!=""} onClose={()=>closeHoverDropDown()} className='bg-base-100 border ' width={400} height={200} defaultDriection={Direcion.DOWN} background={hoverDropDown.bg} button={hoverDropDown.b} >
+                            <DropDown open={hoverDropDown.bg!=''} onClose={()=>closeHoverDropDown()} className='bg-base-100 border ' width={400} height={200} defaultDriection={Direcion.DOWN} background={hoverDropDown.bg} button={hoverDropDown.b} >
                                     <div className='flex flex-col h-[100%]' onMouseEnter={()=>openHoverDropDown(hoverDropDown.user,hoverDropDown.bg,hoverDropDown.b)} >
                                         <div className='flex items-center'>
                                             <img src={hoverDropDown.user.profileImage} className='rounded-full w-[66px] h-[66px]'/> 
@@ -161,8 +185,8 @@ export function List({user,isUser}:{user:any,isUser:boolean}){
                                     </div>
                                 </DropDown>
                             <div className='divider m-1'></div>
-                            <div id="comments" className='flex flex-col w-full h-[650px] overflow-y-scroll'>
-                                <label className='pl-2'>{(article.tags as any[]).map((tag,index)=><a key={index} href="#" className='text-blue-500'>{'#'+tag}</a>) }</label>
+                            <div id='comments' className='flex flex-col w-full h-[650px] overflow-y-scroll'>
+                                <label className='pl-2'>{(article.tags as any[]).map((tag,index)=><a key={index} href='#' className='text-blue-500'>{'#'+tag}</a>) }</label>
                                 <div className='p-2 flex relative'>
                                             <img id={'cb-1'} src={user.profileImage} className='rounded-full w-[44px] h-[44px] cursor-pointer' onMouseEnter={()=>openHoverDropDown(user, 'pbg-1','cb-1')} onMouseLeave={()=>closeHoverDropDown()} /> 
                                             <div className='flex w-[456px] flex-col justify-center p-2'>
@@ -174,7 +198,7 @@ export function List({user,isUser}:{user:any,isUser:boolean}){
                                 {(article.comments as any[]).map((comment, index)=>(
                                     <div key={index}>
                                         <div className='p-2 flex relative'>
-                                            <img id={'cb'+index} src={comment.user.profileImage} className='rounded-full w-[44px] h-[44px] cursor-pointer' onMouseEnter={()=>openHoverDropDown(comment.user,'pbg-1','cb'+index)} onMouseLeave={()=>closeHoverDropDown()} onClick={()=>{if(comment.user.username != user.username)window.location.href="/"+comment.user.username;}}/> 
+                                            <img id={'cb'+index} src={comment.user.profileImage} className='rounded-full w-[44px] h-[44px] cursor-pointer' onMouseEnter={()=>openHoverDropDown(comment.user,'pbg-1','cb'+index)} onMouseLeave={()=>closeHoverDropDown()} onClick={()=>{if(comment.user.username != user.username)window.location.href='/'+comment.user.username;}}/> 
                                             <div className='flex w-[456px] flex-col justify-center p-2'>
                                                 <div><label className='font-bold cursor-pointer]' onMouseEnter={()=>openHoverDropDown(comment.user, 'pbg-1','cb'+index)} onMouseLeave={()=>closeHoverDropDown()}>{comment.user.nickname}</label></div>
                                                 <label className='w-[400px] break-words'>{comment.comment}</label>
@@ -186,18 +210,18 @@ export function List({user,isUser}:{user:any,isUser:boolean}){
                             </div>
                             <div className='flex justify-between'>
                                 <div className='flex'>
-                                    <img src="/commons/heart_off.png" className='p-2 w-[40px] h-[40px] cursor-pointer' alt="save"></img>
-                                    <img src="/commons/link.png"  className='p-2 w-[40px] h-[40px] cursor-pointer' alt="save"></img>
+                                    <img src={article.lovers.includes(user.username)?'/commons/heart_on.png':'/commons/heart_off.png'} onClick={(e )=>{loveArticle({article_id:article.id,username:user.username}).then(()=>refresh())}} className='p-2 w-[40px] h-[40px] cursor-pointer' alt='save'></img>
+                                    <img src='/commons/link.png'  className='p-2 w-[40px] h-[40px] cursor-pointer' alt='save'></img>
                                 </div>
-                                <img src="/commons/save_off.png"  className='p-2 w-[40px] h-[40px] cursor-pointer' alt="save"></img>
+                                <img src='/commons/save_off.png'  className='p-2 w-[40px] h-[40px] cursor-pointer' alt='save'></img>
                             </div>
                             <label className='p-2 text-sm font-bold text-gray-400'><GetDate dateTime={article.dateTime}/></label>
                             <div className='divider m-1'></div>
                             <EmoteDropDown input_id='text' open={isOpen} setIsOpen={(v:boolean)=>setIsOpen(v)} onClick={()=>{const text = document.getElementById('text') as HTMLInputElement; if(text)setSubmitable(text.value.length>0); }} background='pbg-1' button='eb'/>
-                            <div className="p-2 flex">
-                                <EmoteButton id="eb" open={isOpen} setIsOpen={(v:boolean)=>setIsOpen(v)}/>
-                                <input className='w-[400px] p-2' type="text" id="text" maxLength={255} placeholder='댓글 달기...' onKeyDown={(e)=>{if(e.key=="Enter") document.getElementById('text_button')?.click(); setSubmitable((e.target as HTMLInputElement).value.length >0);}} onKeyUp={(e)=>{ setSubmitable((e.target as HTMLInputElement).value.length >0);} }/>
-                                <button disabled={!submitable} id="text_button" className={'p-2 text-center font-bold ' + (submitable?'text-blue-500':'text-gray-500')} onClick={()=>{ const text = (document.getElementById('text') as HTMLInputElement); writeComment({article_id: article.id, comment: text.value}).then(response => refresh()); text.value=''; setSubmitable(false); }} >게시</button>
+                            <div className='p-2 flex'>
+                                <EmoteButton id='eb' open={isOpen} setIsOpen={(v:boolean)=>setIsOpen(v)}/>
+                                <input className='w-[400px] p-2' type='text' id='text' maxLength={255} placeholder='댓글 달기...' onKeyDown={(e)=>{if(e.key=='Enter') document.getElementById('text_button')?.click(); setSubmitable((e.target as HTMLInputElement).value.length >0);}} onKeyUp={(e)=>{ setSubmitable((e.target as HTMLInputElement).value.length >0);} }/>
+                                <button disabled={!submitable} id='text_button' className={'p-2 text-center font-bold ' + (submitable?'text-blue-500':'text-gray-500')} onClick={()=>{ const text = (document.getElementById('text') as HTMLInputElement); writeComment({article_id: article.id, comment: text.value}).then(() => refresh()); text.value=''; setSubmitable(false); }} >게시</button>
                             </div>
                         </div>
                     </Modal>

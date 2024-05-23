@@ -1,7 +1,7 @@
 package com.StarJ.Social.Enums;
 
 public enum Visibility {
-    Everyone, Follower, BothFollower, FriendOnly, Private
+    Everyone, Follower, BothFollower, Private
     //
     ;
 

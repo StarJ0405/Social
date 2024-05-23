@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -16,11 +17,13 @@ public class FollowService {
     private final FollowRepository followRepository;
 
     @Transactional
-    public void save(SiteUser user, SiteUser follower) {
+    public Follow save(SiteUser user, SiteUser follower) {
         Follow follow = Follow.builder().user(user).follower(follower).build();
-        followRepository.save(follow);
+        return followRepository.save(follow);
     }
-
+    public Optional<Follow> getOptional(SiteUser user, SiteUser follower){
+        return followRepository.get(user.getUsername(),follower.getUsername());
+    }
     public List<FollowResponseDTO> getFollowers(SiteUser user) {
         return followRepository.getFollowers(user.getUsername()).stream().map(f -> f.toDTO()).toList();
     }
@@ -30,5 +33,9 @@ public class FollowService {
     }
     public List<FollowResponseDTO> getBothFollower(SiteUser user){
         return followRepository.getBothFollow(user.getUsername()).stream().map(f -> f.toDTO()).toList();
+    }
+    @Transactional
+    public void delete(Follow follow){
+        this.followRepository.delete(follow);
     }
 }

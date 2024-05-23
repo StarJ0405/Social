@@ -234,8 +234,7 @@ export default function Sidebar(){
                                                             <option value={0}>모두 공개</option>
                                                             <option value={1}>팔로워에게 공개</option>
                                                             <option value={2}>맞팔로워에게 공개</option>
-                                                            <option value={3}>친구에게 공개</option>
-                                                            <option value={4}>비공개</option>
+                                                            <option value={3}>비공개</option>
                                                         </select>
                                                     </div>
                                                     <div className='w-full p-2 flex items-center justify-between'>
