@@ -22,9 +22,10 @@ public class UserResponseDTO {
     private String profileImage;
     private List<FollowResponseDTO> followers;
     private List<FollowResponseDTO> followings;
+    private int articleCount;
 
     @Builder
-    public UserResponseDTO(SiteUser user, LocalFile file, List<FollowResponseDTO> followers, List<FollowResponseDTO> followings) {
+    public UserResponseDTO(SiteUser user, LocalFile file, List<FollowResponseDTO> followers, List<FollowResponseDTO> followings, int articleCount) {
         this.username = user.getUsername();
         this.nickname = user.getNickname();
         this.email = user.getEmail();
@@ -34,5 +35,6 @@ public class UserResponseDTO {
         this.profileImage = file != null ? file.getV() : null;
         this.followers = followers;
         this.followings = followings;
+        this.articleCount = articleCount;
     }
 }

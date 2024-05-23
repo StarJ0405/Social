@@ -1,5 +1,5 @@
 import Main from '@/app/global/main';
-import {fetchUser} from '@/app/API/nonUserAPI';
+import {fetchArticleList, fetchUser} from '@/app/API/nonUserAPI';
 import {Avatar, List} from "./CSR"
 
 
@@ -7,7 +7,7 @@ export default async function Home({params}:{params:any}) {
     const user = await fetchUser(params.username);
     function isUser(){
         return user !=null && user.username == params.username;
-    }
+    }   
     async function Profile() {
         if(!user)
             return (
@@ -30,9 +30,9 @@ export default async function Home({params}:{params:any}) {
                             <button className="btn">프로필 편집</button>
                         </div>
                         <div className="mb-5">
-                            <label className="mr-5">게시물</label>
-                            <label className="mr-5">팔로워</label>
-                            <label className="mr-5">팔로우</label>
+                            <label className="mr-5">게시물 {user.articleCount}</label>
+                            <label className="mr-5">팔로워 {user.followers.length}</label>
+                            <label className="mr-5">팔로우 {user.followings.length}</label>
                         </div>
                         <div className="flex flex-col">
                             <label className="text-xs font-bold">{user.nickname}</label>

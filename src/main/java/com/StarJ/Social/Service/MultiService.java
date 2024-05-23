@@ -94,17 +94,18 @@ public class MultiService {
     }
 
     public UserResponseDTO getUserResponseDTO(SiteUser user) {
-        return UserResponseDTO                                      //
-                .builder()                                          //
-                .user(user)                                         //
-                .file(this.localFileService                         //
-                        .getNullable(LocalFileKeywords              //
-                                .profileImage                       //
-                                .getValue(user                      //
-                                        .getUsername())))           //
-                .followers(this.followService.getFollowers(user))   //
-                .followings(this.followService.getFollowings(user)) //
-                .build();                                           //
+        return UserResponseDTO                                                              //
+                .builder()                                                              //
+                .user(user)                                                             //
+                .file(this.localFileService                                             //
+                        .getNullable(LocalFileKeywords                                  //
+                                .profileImage                                           //
+                                .getValue(user                                          //
+                                        .getUsername())))                               //
+                .followers(this.followService.getFollowers(user))                       //
+                .followings(this.followService.getFollowings(user))                     //
+                .articleCount(this.articleService.getList(user.getUsername()).size())   //
+                .build();                                                               //
     }
 
     @Transactional

@@ -202,9 +202,9 @@ export default function Sidebar(){
                                     <div>
                                         <div className="flex flex-col">
                                             <textarea id="text" className="w-full h-[200px] resize-none outline-none overflow-y-scroll" maxLength={2200} placeholder="문구를 입력하세요..." onKeyDown={(e:any)=>{const value = e.target.value as string; setContent(value?value:"");}} onKeyUp={(e:any)=>{const value = e.target.value as string; setContent(value?value:"");}}></textarea>
-                                            <div className="flex justify-between relative">
-                                                <EmoteButton open={isOpen} setIsOpen={(v:boolean)=>setIsOpen(v)} />
-                                                <EmoteDropDown input_id='text' position="top-[25px] left-[10px]" open={isOpen} setIsOpen={(v:boolean)=>setIsOpen(v) } />
+                                            <div id="ebg" className="flex justify-between relative">
+                                                <EmoteButton id="eb" open={isOpen} setIsOpen={(v:boolean)=>setIsOpen(v)} />
+                                                <EmoteDropDown input_id='text' open={isOpen} setIsOpen={(v:boolean)=>setIsOpen(v) } background='ebg' button='eb'/>
                                                 <label>{content.length}/2200</label> 
                                             </div>
                                         </div>
