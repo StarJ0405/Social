@@ -5,7 +5,7 @@ export default function Main({body} : {body:any}) {
   return (
        <main className="flex">
             <Sidebar/>
-            <div className="main w-full overflow-y-auto">
+            <div className="main w-full">
                 {body}
                 <footer className="footer w-full h-[15%] footer-center p-10 bg-base-200 text-base-content rounded">
                   <nav className="grid grid-flow-col gap-4">

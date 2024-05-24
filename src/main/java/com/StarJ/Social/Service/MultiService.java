@@ -106,7 +106,7 @@ public class MultiService {
                                         .getUsername())))                               //
                 .followers(this.followService.getFollowers(user))                       //
                 .followings(this.followService.getFollowings(user))                     //
-                .articleCount(this.articleService.getList(user.getUsername()).size())   //
+                .articleCount(this.articleService.getList(user.getUsername(),0).size())   //
                 .build();                                                               //
     }
 
@@ -141,7 +141,9 @@ public class MultiService {
     public void deleteProfileImage(String username) {
         localFileService.deleteWithFile(LocalFileKeywords.profileImage.getValue(username));
     }
-
+    public boolean isFollow(String owner,String user){
+        return this.followService.getOptional(this.userService.get(owner),this.userService.get(user)).isPresent();
+    }
     /**
      * Article
      */
@@ -187,9 +189,9 @@ public class MultiService {
                 .build();                                                                                   //
     }
 
-    public List<ArticleResponseDTO> getDatas(String username) {
+    public List<ArticleResponseDTO> getDatas(String username, long page) {
         List<ArticleResponseDTO> list = new ArrayList<>();
-        for (Article article : this.articleService.getList(username))
+        for (Article article : this.articleService.getList(username,page))
             list.add(getArticleResponseDTO(article));
         return list;
     }

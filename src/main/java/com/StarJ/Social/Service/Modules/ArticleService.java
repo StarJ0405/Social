@@ -23,7 +23,10 @@ public class ArticleService {
         Optional<Article> _article = articleRepository.findById(article_id);
         return _article.orElseThrow();
     }
-    public List<Article> getList(String username){
-        return articleRepository.getListByUsername(username);
+    public long count(String username){
+        return articleRepository.getCount(username);
+    }
+    public List<Article> getList(String username, long page){
+        return articleRepository.getListByUsername(username,page);
     }
 }

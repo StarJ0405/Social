@@ -36,7 +36,7 @@ public class ArticleController {
 
     @GetMapping("/list")
     public ResponseEntity<?> getList(@RequestHeader("Username") String username, @RequestHeader("Page") Long page) {
-        return ResponseEntity.status(HttpStatus.OK).body(multiService.getDatas(username));
+        return ResponseEntity.status(HttpStatus.OK).body(multiService.getDatas(username,page));
     }
 
     @PostMapping("/love")

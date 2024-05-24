@@ -6,7 +6,6 @@ import Modal from "@/app/global/Modal"
 import {EmoteDropDown,EmoteButton} from "@/app/global/Emotes"
 
 export default function Sidebar(){
-    const [width, setWidth] = useState(0);
     const [isFold, setIsFold] = useState(false);
     const [isDrag, setIsDrag] = useState(false);
     const [isTagOpen, setIsTagOpen] = useState(false);
@@ -89,7 +88,6 @@ export default function Sidebar(){
     }, [ACCESS_TOKEN]);
     useEffect(() => {
         const updateWidth = () => {
-            setWidth(window.innerWidth);
             setIsFold(window.innerWidth < 1250);
         };
         updateWidth();
@@ -97,8 +95,8 @@ export default function Sidebar(){
         return () => window.removeEventListener('resize', updateWidth);
     }, []);
 
-    return (
-        <div className={'sidebar h-screen border-r-2 flex flex-col justify-start '+ (isFold?"w-[120px]" :'w-[300px]')}>
+    return (<><p className={'h-screen '+(isFold?" min-w-[120px] " :' min-w-[300px] ')}></p>
+        <div className={'fixed sidebar h-screen border-r-2 flex flex-col justify-start '+ (isFold?"w-[120px]" :'w-[300px]')}>
             <div className="logo w-full h-[100px] pl-5 flex justify-start items-center">
                 <a href="/">
                     <Logo/>
@@ -137,7 +135,7 @@ export default function Sidebar(){
                 <Icon  name="알림"/>
             </div>
             <div className="create flex w-full h-[60px] pl-5 mb-3 items-center cursor-pointer">
-                <a onClick={() => { setIsModalOpen(true); setIsArticleModalOpen(false); } } className="flex items-center">
+                <a onClick={() => { setIsModalOpen(true); setIsArticleModalOpen(false); setArticleTmepImage(null); } } className="flex items-center">
                     <img src="/commons/create.png" className="w-[44px] h-[44px]" alt="create"/>
                     <Icon  name="만들기"/>
                 </a>
@@ -260,5 +258,5 @@ export default function Sidebar(){
             </div>
             <More />
         </div>
-    );
+    </>);
 }

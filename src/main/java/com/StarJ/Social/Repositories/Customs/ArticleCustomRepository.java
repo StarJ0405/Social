@@ -5,5 +5,7 @@ import com.StarJ.Social.Domains.Article;
 import java.util.List;
 
 public interface ArticleCustomRepository {
-    List<Article> getListByUsername(String username);
+    List<Article> getListByUsername(String username, long page);
+
+    long getCount(String username);
 }

@@ -1,14 +1,13 @@
 import Main from '@/app/global/main';
-import { fetchnonUser} from '@/app/API/nonUserAPI';
+import { fetchArticleList, fetchnonUser} from '@/app/API/nonUserAPI';
 import {Avatar, List, Tool} from "./CSR"
 
 
 export default async function Home({params}:{params:any}) {
-    const owner = await fetchnonUser(params.username);
-    function isUser(){
-        return owner !=null && owner.username == params.username;
-    }  
-    async function Profile() {
+    let owner = await fetchnonUser(params.username);
+    const articleList = await fetchArticleList({username:owner.username,page:0});
+    
+    async function Profile() {            
         if(!owner)
             return (
                 <div className="flex flex-col text-center">
@@ -32,8 +31,8 @@ export default async function Home({params}:{params:any}) {
                         </div>
                         <div className="mb-5">
                             <label className="mr-5">게시물 {owner.articleCount}</label>
-                            <label className="mr-5">팔로워 {owner.followers.length}</label>
-                            <label className="mr-5">팔로우 {owner.followings.length}</label>
+                            <label className="mr-5 cursor-pointer">팔로워 {owner.followers.length}</label>
+                            <label className="mr-5 cursor-pointer">팔로우 {owner.followings.length}</label>
                         </div>
                         <div className="flex flex-col">
                             <label className="text-xs font-bold">{owner.nickname}</label>
@@ -45,10 +44,10 @@ export default async function Home({params}:{params:any}) {
     }
   const body =
   (<div className="w-full h-full flex flex-col items-center justify-start">
-        <div className='w-[1236px]'>
+        <div className='w-[60%]'>
             <Profile />
             <div className='self-center divider'></div>
-            <List user={owner}/>
+            <List user={owner} articleList={articleList}/>
         </div>
   </div>);
   return (

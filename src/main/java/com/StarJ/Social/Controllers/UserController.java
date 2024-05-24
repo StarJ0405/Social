@@ -3,13 +3,14 @@ package com.StarJ.Social.Controllers;
 import com.StarJ.Social.DTOs.FollowRequestDTO;
 import com.StarJ.Social.DTOs.UserRequestDTO;
 import com.StarJ.Social.DTOs.UserResponseDTO;
-import com.StarJ.Social.Domains.Follow;
 import com.StarJ.Social.Records.TokenRecord;
 import com.StarJ.Social.Service.MultiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
@@ -61,6 +62,8 @@ public class UserController {
         if (tokenRecord.isOK()) {
             String username = tokenRecord.username();
             this.multiService.delete(username);
+            List<String> a;
+
         }
         return tokenRecord.getResponseEntity();
     }
