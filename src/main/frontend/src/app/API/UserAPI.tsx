@@ -1,5 +1,4 @@
 import {getAPI} from '@/app/API/axiosAPI';
-import exp from 'constants';
 
 export const UserApi = getAPI();
 

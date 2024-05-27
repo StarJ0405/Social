@@ -2,6 +2,12 @@ import {getAPI} from '@/app/API/axiosAPI';
 
 export const NonUserApi = getAPI();
 /** 게시글 불러오기 */
+export const fetchArticle = async({article_id}:{article_id:number}) => {
+    const response = await NonUserApi.get(`/api/article`,{headers: {
+        'ArticleID': article_id,
+    }});
+    return response.data;
+}
 export const fetchArticleList = async({username , page}:{username:string,page:number}) => {
     const response = await NonUserApi.get(`/api/article/list`,{headers: {
         'Username': username,

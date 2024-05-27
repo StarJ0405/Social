@@ -62,8 +62,6 @@ public class UserController {
         if (tokenRecord.isOK()) {
             String username = tokenRecord.username();
             this.multiService.delete(username);
-            List<String> a;
-
         }
         return tokenRecord.getResponseEntity();
     }
