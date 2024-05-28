@@ -15,10 +15,15 @@ import java.util.Optional;
 public class ChatParticipantService {
     private final ChatParticipantRepository chatParticipantRepository;
 
-    public Optional<ChatParticipant> getOptional(SiteUser user){
+    public ChatParticipant create(ChatRoom room, SiteUser user) {
+        return chatParticipantRepository.save(ChatParticipant.builder().chatRoom(room).participant(user).build());
+    }
+
+    public Optional<ChatParticipant> getOptional(SiteUser user) {
         return chatParticipantRepository.get(user.getUsername());
     }
-    public List<ChatParticipant> getList(ChatRoom chatRoom){
+
+    public List<ChatParticipant> getList(ChatRoom chatRoom) {
         return chatParticipantRepository.getList(chatRoom.getId());
     }
 }

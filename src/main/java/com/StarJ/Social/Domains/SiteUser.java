@@ -3,17 +3,14 @@ package com.StarJ.Social.Domains;
 import com.StarJ.Social.DTOs.UserRequestDTO;
 import com.StarJ.Social.Enums.UserRole;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SiteUser {
     @Id
     private String username;

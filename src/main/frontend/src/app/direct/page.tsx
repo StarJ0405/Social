@@ -1,6 +1,6 @@
 "use client"
 import { useEffect, useState } from "react";
-import { fetchUser, saveArticleTempImage, writeArticle } from "../api/UserAPI";
+import { createRoom, fetchUser, saveArticleTempImage, writeArticle } from "../api/UserAPI";
 import { redirect } from 'next/navigation';
 import Modal from "../global/Modal";
 import { EmoteButton, EmoteDropDown } from "../global/Emotes";
@@ -25,10 +25,11 @@ export default function Home(){
     const [isOpen,setIsOpen] = useState(false);
     const [content, setContent] = useState('');
     const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
-    const [search,setSearch] = useState('');
     const [searchedUsers,setSearchedUsers] = useState(null as unknown as any[]);
     const [selectedUsers,setSelectedUsers]  = useState(null as unknown as any[]);
     const [searchInterval,setSearchInterval] = useState(null as any);
+    const [isCreateingRomm, setIsCreateingRomm] = useState(false);
+    const [room,setRoom] = useState(null as any);
     const upload = async(file:any) => {
         const formData = new FormData();
         formData.append('file',file);
@@ -123,7 +124,7 @@ export default function Home(){
             if(searchInterval)
                 clearInterval(searchInterval);
             const timer = setInterval(() => {
-                fetchnonUsers(value).then(response=>{
+                fetchnonUsers(value,user.username).then(response=>{
                     setSearchedUsers(response);
                     setSearchInterval(null);
                 }).catch(error=>{console.log(error); setSearchInterval(null);});
@@ -136,7 +137,29 @@ export default function Home(){
             setSearchedUsers(null as unknown as any[]);
         }
     }
-
+    function CreateRoom(){
+        const data = selectedUsers?.map(user=>user.username) as string[];
+        if(data&&!isCreateingRomm){
+            setIsCreateingRomm(true);
+            createRoom(data).then(response => {
+                if(isMessageModalOpen)
+                    setRoom(response);
+                setIsMessageModalOpen(false);
+                setSelectedUsers(null as unknown as any[]);
+                setSearchedUsers(null as unknown as any[]);
+                setIsCreateingRomm(false);
+            }).catch(error=>{
+                console.log(error)
+                setIsCreateingRomm(false);
+            });
+        }
+    }
+    function closeMessageModal(){
+        setIsMessageModalOpen(false);
+        setSelectedUsers(null as unknown as any[]);
+        setSearchedUsers(null as unknown as any[]);
+        setIsCreateingRomm(false);
+    }
     return ( 
     <main className="flex">
         <p className={'h-screen min-w-[500px]'}></p>
@@ -295,11 +318,11 @@ export default function Home(){
                     <More />
                 </div>
                 <Extra/>
-                <Modal open={isMessageModalOpen} onClose={()=>{setIsMessageModalOpen(false)}} className='' outlineClose={true} escClose={true}>
+                <Modal open={isMessageModalOpen} onClose={closeMessageModal} className='' outlineClose={true} escClose={true}>
                     <div className="flex flex-col" style={{width:550+'px',height:600+'px'}}>
                         <div className="flex justify-center items-center relative my-5">
                             <label className="text-lg font-bold">새로운 메시지</label>
-                            <img src="/commons/x.png" className="fixed right-5" style={{width:18+'px',height:18+'px'}}/>
+                            <img src="/commons/x.png" className="fixed right-5 cursor-pointer" onClick={closeMessageModal} style={{width:18+'px',height:18+'px'}}/>
                         </div>
                         <div className="divider my-0"></div>
                         <div className="flex px-4">
@@ -331,7 +354,7 @@ export default function Home(){
                                 <label className="mx-5 text-gray-500 text-sm">계정을 찾을 수 없습니다.</label>
                             }
                         </div>
-                        <button className="btn btn-info text-white m-4" disabled={!selectedUsers||selectedUsers.length==0}>채팅</button>
+                        <button className="btn btn-info text-white m-4" disabled={!selectedUsers||selectedUsers.length==0} onClick={()=>CreateRoom()} > {isCreateingRomm?'생성중':'채팅'}</button>
                     </div>
                 </Modal>
             </div> 

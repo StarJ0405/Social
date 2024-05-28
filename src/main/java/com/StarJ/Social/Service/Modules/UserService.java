@@ -33,8 +33,8 @@ public class UserService {
                 () -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다. user_id = " + value));
     }
     @Transactional
-    public List<SiteUser> getList(String value) {
-        return this.userRepository.list(value);
+    public List<SiteUser> getList(String value,String username) {
+        return this.userRepository.list(value,username);
     }
     @Transactional
     public void update(String username, String nickname, String email, String phoneNumber, String password,String description) {

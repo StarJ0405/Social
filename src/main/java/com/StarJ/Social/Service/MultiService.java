@@ -35,6 +35,10 @@ public class MultiService {
     private final CommentService commentService;
     private final FollowService followService;
     private final LoveService loveService;
+    private final ChatRoomService chatRoomService;
+    private final ChatParticipantService chatParticipantService;
+    private final ChatMessageService chatMessageService;
+    private final ChatImageService chatImageService;
 
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -94,12 +98,14 @@ public class MultiService {
     public UserResponseDTO getUserResponseDTO(String username) {
         return getUserResponseDTO(userService.get(username));
     }
-    public List<UserResponseDTO> getUserResponseDTOs(String like) {
+
+    public List<UserResponseDTO> getUserResponseDTOs(String like,String username) {
         List<UserResponseDTO> list = new ArrayList<>();
-        for(SiteUser user : userService.getList(like))
+        for (SiteUser user : userService.getList(like,username))
             list.add(getUserResponseDTO(user));
         return list;
     }
+
     public UserResponseDTO getUserResponseDTO(SiteUser user) {
         return UserResponseDTO                                                              //
                 .builder()                                                              //
@@ -111,7 +117,7 @@ public class MultiService {
                                         .getUsername())))                               //
                 .followers(this.followService.getFollowers(user))                       //
                 .followings(this.followService.getFollowings(user))                     //
-                .articleCount(this.articleService.getList(user.getUsername(),0).size())   //
+                .articleCount(this.articleService.getList(user.getUsername(), 0).size())   //
                 .build();                                                               //
     }
 
@@ -146,9 +152,11 @@ public class MultiService {
     public void deleteProfileImage(String username) {
         localFileService.deleteWithFile(LocalFileKeywords.profileImage.getValue(username));
     }
-    public boolean isFollow(String owner,String user){
-        return this.followService.getOptional(this.userService.get(owner),this.userService.get(user)).isPresent();
+
+    public boolean isFollow(String owner, String user) {
+        return this.followService.getOptional(this.userService.get(owner), this.userService.get(user)).isPresent();
     }
+
     /**
      * Article
      */
@@ -163,8 +171,7 @@ public class MultiService {
                 String preV = localFile.getV();
                 String newV = "/articles/" + article.getId().toString() + "/" + UUID.randomUUID().toString() + "." + preV.split("\\.")[1];
                 File file = new File(path + newV);
-                if (!file.getParentFile().exists())
-                    file.getParentFile().mkdirs();
+                if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
                 Files.move(Paths.get(path + preV), Paths.get(path + newV), StandardCopyOption.REPLACE_EXISTING);
                 localFileService.delete(localFile);
                 localFileService.save(LocalFileKeywords.articleImage.getValue(article.getId().toString()), newV);
@@ -196,7 +203,7 @@ public class MultiService {
 
     public List<ArticleResponseDTO> getDatas(String username, long page) {
         List<ArticleResponseDTO> list = new ArrayList<>();
-        for (Article article : this.articleService.getList(username,page))
+        for (Article article : this.articleService.getList(username, page))
             list.add(getArticleResponseDTO(article));
         return list;
     }
@@ -241,26 +248,50 @@ public class MultiService {
     public boolean love(String username, Long articleId) {
         SiteUser user = userService.get(username);
         Article article = articleService.get(articleId);
-        Optional<Love> _love = loveService.getOptional(user,article);
-        if(_love.isPresent()){
+        Optional<Love> _love = loveService.getOptional(user, article);
+        if (_love.isPresent()) {
             loveService.delete(_love.get());
             return false;
-        }else {
+        } else {
             loveService.save(user, article);
             return true;
         }
     }
+
     @Transactional
     public boolean follow(FollowRequestDTO requestDto) {
         SiteUser user = userService.get(requestDto.getUsername());
         SiteUser follower = userService.get(requestDto.getFollower());
-        Optional<Follow> _follow = followService.getOptional(user,follower);
-        if(_follow.isPresent()){
+        Optional<Follow> _follow = followService.getOptional(user, follower);
+        if (_follow.isPresent()) {
             followService.delete(_follow.get());
             return false;
-        }else {
-             followService.save(user, follower);
-             return true;
+        } else {
+            followService.save(user, follower);
+            return true;
         }
     }
+    /**
+     * 채팅
+     */
+    @Transactional
+    public ChatRoomResponseDTO createChatRoom(String username, List<String> participants_name) {
+        SiteUser owner = userService.get(username);
+        ChatRoom room = chatRoomService.create(owner);
+        List<UserResponseDTO> participants = new ArrayList<>();
+        for(String name :participants_name) {
+            SiteUser participant = userService.get(name);
+            chatParticipantService.create(room, participant);
+            participants.add(getUserResponseDTO(participant));
+        }
+        return ChatRoomResponseDTO.builder().owner(getUserResponseDTO(owner)).participants(participants).chats(new ArrayList<>()).build();
+    }
+    @Transactional
+    public ChatMessage createChat(Long room_id,String sender_name, String message){
+        SiteUser sender = userService.get(sender_name);
+        ChatRoom room = chatRoomService.get(room_id);
+        return chatMessageService.Create(room,sender,message);
+    }
+
+
 }

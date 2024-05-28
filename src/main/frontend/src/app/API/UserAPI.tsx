@@ -116,3 +116,8 @@ export const follow = async(data:FollwoProps)=>{
     const response = await UserApi.post('/api/user/follow',data);
     return response.data;
 }
+
+export const createRoom = async(data:string[])=>{
+    const response = await UserApi.post('/api/chat/createRoom',data);
+    return response.data;
+}

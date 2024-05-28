@@ -24,9 +24,9 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
     @GetMapping("/list")
-    public ResponseEntity<?> list(@RequestHeader("Like") String like) {
+    public ResponseEntity<?> list(@RequestHeader("Like") String like, @RequestHeader("NotInclude")String username) {
         try {
-            List<UserResponseDTO> userResponseDtos = this.multiService.getUserResponseDTOs(like);
+            List<UserResponseDTO> userResponseDtos = this.multiService.getUserResponseDTOs(like,username);
             return ResponseEntity.status(HttpStatus.OK).body(userResponseDtos);
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.status(HttpStatus.OK).body(null);

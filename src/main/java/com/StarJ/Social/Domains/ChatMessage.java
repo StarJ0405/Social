@@ -1,15 +1,14 @@
 package com.StarJ.Social.Domains;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatMessage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,13 +18,13 @@ public class ChatMessage {
     @ManyToOne(fetch = FetchType.LAZY)
     private SiteUser sender;
     @Setter
-    private String msg;
+    private String message;
     private LocalDateTime createDate;
-
-    public ChatMessage(ChatRoom chatRoom, SiteUser sender, String msg) {
+    @Builder
+    public ChatMessage(ChatRoom chatRoom, SiteUser sender, String message) {
         this.chatRoom = chatRoom;
         this.sender = sender;
-        this.msg = msg;
+        this.message = message;
         this.createDate = LocalDateTime.now();
     }
 }

@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface UserCustomRepository {
     Optional<SiteUser> find(String value);
-    List<SiteUser> list(String like);
+    List<SiteUser> list(String like,String username);
 
 }
