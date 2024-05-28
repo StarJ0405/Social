@@ -32,7 +32,7 @@ public class UserResponseDTO {
         this.role = user.getRole();
         this.phoneNumber = user.getPhoneNumber();
         this.description = user.getDescription();
-        this.profileImage = file != null ? file.getV() : null;
+        this.profileImage = file != null ? file.getV() : "/commons/basic_profile.png";
         this.followers = followers;
         this.followings = followings;
         this.articleCount = articleCount;

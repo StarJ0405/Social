@@ -22,3 +22,9 @@ export const fetchnonUser = async(username : string) => {
     }});
     return response.data ;
 }
+export const fetchnonUsers = async(like : string) => {
+    const response = await NonUserApi.get('/api/user/list',{headers: {
+        'Like': like,
+    }});
+    return response.data ;
+}

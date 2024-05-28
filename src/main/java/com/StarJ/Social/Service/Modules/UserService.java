@@ -28,6 +28,15 @@ public class UserService {
                 .build());                                  //
     }
     @Transactional
+    public SiteUser get(String value) {
+        return this.userRepository.findById(value).orElseThrow(
+                () -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다. user_id = " + value));
+    }
+    @Transactional
+    public List<SiteUser> getList(String value) {
+        return this.userRepository.list(value);
+    }
+    @Transactional
     public void update(String username, String nickname, String email, String phoneNumber, String password,String description) {
         SiteUser user = get(username);
         user.setNickname(nickname);
@@ -44,11 +53,7 @@ public class UserService {
         this.userRepository.delete(user);
     }
 
-    @Transactional
-    public SiteUser get(String value) {
-        return this.userRepository.findById(value).orElseThrow(
-                () -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다. user_id = " + value));
-    }
+
     public boolean isMatch(String password1, String password2){
         return passwordEncoder.matches(password1,password2);
     }

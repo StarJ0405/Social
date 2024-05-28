@@ -94,7 +94,12 @@ public class MultiService {
     public UserResponseDTO getUserResponseDTO(String username) {
         return getUserResponseDTO(userService.get(username));
     }
-
+    public List<UserResponseDTO> getUserResponseDTOs(String like) {
+        List<UserResponseDTO> list = new ArrayList<>();
+        for(SiteUser user : userService.getList(like))
+            list.add(getUserResponseDTO(user));
+        return list;
+    }
     public UserResponseDTO getUserResponseDTO(SiteUser user) {
         return UserResponseDTO                                                              //
                 .builder()                                                              //

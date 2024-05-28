@@ -23,9 +23,17 @@ public class UserController {
         this.multiService.createUser(requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
-
+    @GetMapping("/list")
+    public ResponseEntity<?> list(@RequestHeader("Like") String like) {
+        try {
+            List<UserResponseDTO> userResponseDtos = this.multiService.getUserResponseDTOs(like);
+            return ResponseEntity.status(HttpStatus.OK).body(userResponseDtos);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.OK).body(null);
+        }
+    }
     @GetMapping("/data")
-    public ResponseEntity<?> getData(@RequestHeader("Username") String username) {
+    public ResponseEntity<?> get(@RequestHeader("Username") String username) {
         try {
             UserResponseDTO userResponseDto = this.multiService.getUserResponseDTO(username);
             return ResponseEntity.status(HttpStatus.OK).body(userResponseDto);

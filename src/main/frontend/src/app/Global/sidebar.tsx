@@ -61,7 +61,7 @@ export default function Sidebar(){
         return (
             <div className='avatar w-[44px] h-[44px]'>
                 <div className='w-24 rounded-full'>
-                    <img id='mini_profile_img' src={user?.profileImage?user?.profileImage:'/commons/basic_profile.png'} className='w-[24px] h-[24px]' alt='profile' />
+                    <img id='mini_profile_img' src={user?.profileImage} className='w-[24px] h-[24px]' alt='profile' />
                 </div>
             </div>
         );

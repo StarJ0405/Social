@@ -4,6 +4,7 @@ import { fetchUser, saveArticleTempImage, writeArticle } from "../api/UserAPI";
 import { redirect } from 'next/navigation';
 import Modal from "../global/Modal";
 import { EmoteButton, EmoteDropDown } from "../global/Emotes";
+import { fetchnonUsers } from "../API/NonUserAPI";
 
 
 
@@ -24,6 +25,10 @@ export default function Home(){
     const [isOpen,setIsOpen] = useState(false);
     const [content, setContent] = useState('');
     const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+    const [search,setSearch] = useState('');
+    const [searchedUsers,setSearchedUsers] = useState(null as unknown as any[]);
+    const [selectedUsers,setSelectedUsers]  = useState(null as unknown as any[]);
+    const [searchInterval,setSearchInterval] = useState(null as any);
     const upload = async(file:any) => {
         const formData = new FormData();
         formData.append('file',file);
@@ -41,7 +46,7 @@ export default function Home(){
         return (
             <div className='avatar w-[44px] h-[44px]'>
                 <div className='w-24 rounded-full'>
-                    <img id='mini_profile_img' src={user?.profileImage?user?.profileImage:'/commons/basic_profile.png'} className='w-[24px] h-[24px]' alt='profile' />
+                    <img id='mini_profile_img' src={user?.profileImage} className='w-[24px] h-[24px]' alt='profile' />
                 </div>
             </div>
         );
@@ -112,9 +117,29 @@ export default function Home(){
             :
                 <></>);        
     }
-    function SideBar(){
-        return <>
-            <p className={'h-screen min-w-[500px]'}></p>
+    function Search(e:any){
+        const value = e?.value;
+        if(value){
+            if(searchInterval)
+                clearInterval(searchInterval);
+            const timer = setInterval(() => {
+                fetchnonUsers(value).then(response=>{
+                    setSearchedUsers(response);
+                    setSearchInterval(null);
+                }).catch(error=>{console.log(error); setSearchInterval(null);});
+                clearInterval(timer);
+            }, 3000);
+            setSearchInterval(timer);
+        }else{
+            clearInterval(searchInterval);
+            setSearchInterval(null);
+            setSearchedUsers(null as unknown as any[]);
+        }
+    }
+
+    return ( 
+    <main className="flex">
+        <p className={'h-screen min-w-[500px]'}></p>
             <div className={'fixed sidebar h-screen flex w-[500px] z-[5]'}>
                 <div className={'h-screen border-r-2 flex flex-col justify-start w-[120px]'}>
                     <div className='logo w-full h-[100px] pl-5 flex justify-start items-center'>
@@ -278,35 +303,51 @@ export default function Home(){
                         </div>
                         <div className="divider my-0"></div>
                         <div className="flex px-4">
-                            <label className="font-bold">받는 사람 : </label><input type="text" className="ml-4 outline-none" autoFocus placeholder="검색..."/>
+                            <label className="font-bold min-w-[77px] my-1">받는 사람 : </label>
+                            <div className="flex flex-wrap w-full">
+                            {selectedUsers&&selectedUsers.length>0 ?
+                                selectedUsers?.map((u,index)=> <button className="btn btn-sm btn-info px-2 mx-1 text-white hover:text-black" key={index} onClick={()=>{const newUsers= selectedUsers.filter(check=>check!=u);setSelectedUsers(newUsers) }}>{u?.username}</button>)
+                            :
+                                <></>
+                            }
+                            <input id="search" type="text" className="ml-4 outline-none my-1" autoFocus placeholder="검색..." onChange={(e)=> Search(e.target)}/>
+                            </div>
                         </div>
                         <div className="divider my-0"></div>
-                        <textarea disabled placeholder="계정을 찾을 수 없습니다." className="mx-5" style={{width:548+'px',height:448+'px'}}>
-                        </textarea>
-                        <button className="btn btn-info text-white m-4" disabled>채팅</button>
+                        <div className="overflow-y-scroll" style={{width:548+'px',height:448+'px'}}>
+                            {searchInterval?
+                                <></>
+                            :searchedUsers && searchedUsers.length!=0 ?
+                                <>{searchedUsers.map((u,index)=><div key={index}>
+                                    <div className="cursor-pointer hover:bg-base-300 flex my-2 px-5" onClick={()=>{const users = selectedUsers? selectedUsers: [] as any[]; if(!selectedUsers?.includes(u)) setSelectedUsers([...users,u]); (document.getElementById('search') as HTMLInputElement).value=''; clearInterval(searchInterval);setSearchInterval(null);setSearchedUsers(null as unknown as [])}}>
+                                        <img src={u?.profileImage} className="rounded-full my-2" style={{width:44+'px',height:44+'px'}}/>
+                                        <div className="flex flex-col justify-center mx-2">
+                                            <label className="text-sm">{u?.nickname}</label>
+                                            <label className="text-sm">{u?.username}</label>
+                                        </div>
+                                    </div>
+                                </div> )}</>
+                            :
+                                <label className="mx-5 text-gray-500 text-sm">계정을 찾을 수 없습니다.</label>
+                            }
+                        </div>
+                        <button className="btn btn-info text-white m-4" disabled={!selectedUsers||selectedUsers.length==0}>채팅</button>
                     </div>
                 </Modal>
             </div> 
             {status!=0?<div className={'fixed right-0 h-screen z-[5]'} style={{width:(window.innerWidth-515+'px')}} onClick={()=>setStatus(0)}></div>:null}
-        </>;
-    }
-    function Children(){
-        return (
-            status==0?
-                <div className="h-full w-full flex flex-col items-center justify-center">
-                    <img src="/commons/my_message.png" style={{width:96+'px',height:96+'px'}}/>
-                    <label className="text-2xl p-3">내 메시지</label>
-                    <label>친구나 그룹에 비공개 사진과 메시지를 보내보세요</label>
-                    <button className="btn btn-info text-white btn-sm m-5" onClick={()=>openMessage()}>메시지 보내기</button>
-                </div>
-            :
-        <></>);
-    }
-    return ( 
-    <main className="flex">
-        <SideBar/>
         <div className="main w-full">
-        <Children/>
+        {
+        status==0?
+            <div className="h-full w-full flex flex-col items-center justify-center">
+                <img src="/commons/my_message.png" style={{width:96+'px',height:96+'px'}}/>
+                <label className="text-2xl p-3">내 메시지</label>
+                <label>친구나 그룹에 비공개 사진과 메시지를 보내보세요</label>
+                <button className="btn btn-info text-white btn-sm m-5" onClick={()=>openMessage()}>메시지 보내기</button>
+            </div>
+        :
+            <></>
+        }
       </div>    
     </main>);
 }
