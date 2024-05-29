@@ -22,6 +22,8 @@ public class QSiteUser extends EntityPathBase<SiteUser> {
 
     public static final QSiteUser siteUser = new QSiteUser("siteUser");
 
+    public final DateTimePath<java.time.LocalDateTime> activeDate = createDateTime("activeDate", java.time.LocalDateTime.class);
+
     public final QAuth auth;
 
     public final DateTimePath<java.time.LocalDateTime> createDate = createDateTime("createDate", java.time.LocalDateTime.class);

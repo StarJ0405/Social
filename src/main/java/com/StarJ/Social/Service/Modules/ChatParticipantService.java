@@ -19,11 +19,4 @@ public class ChatParticipantService {
         return chatParticipantRepository.save(ChatParticipant.builder().chatRoom(room).participant(user).build());
     }
 
-    public Optional<ChatParticipant> getOptional(SiteUser user) {
-        return chatParticipantRepository.get(user.getUsername());
-    }
-
-    public List<ChatParticipant> getList(ChatRoom chatRoom) {
-        return chatParticipantRepository.getList(chatRoom.getId());
-    }
 }

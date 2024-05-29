@@ -19,7 +19,10 @@ public class ChatMessage {
     private SiteUser sender;
     @Setter
     private String message;
+    @OneToMany(mappedBy = "chatMessage", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<ChatImage> chatImages;
     private LocalDateTime createDate;
+
     @Builder
     public ChatMessage(ChatRoom chatRoom, SiteUser sender, String message) {
         this.chatRoom = chatRoom;

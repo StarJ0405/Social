@@ -1,10 +1,11 @@
 "use client"
 import { useEffect, useState } from "react";
-import { createRoom, fetchUser, saveArticleTempImage, writeArticle } from "../api/UserAPI";
+import { createRoom, fetchUser, getRooms, saveArticleTempImage, writeArticle } from "../api/UserAPI";
 import { redirect } from 'next/navigation';
 import Modal from "../global/Modal";
 import { EmoteButton, EmoteDropDown } from "../global/Emotes";
 import { fetchnonUsers } from "../API/NonUserAPI";
+import { Days } from "../[username]/CSR";
 
 
 
@@ -30,6 +31,8 @@ export default function Home(){
     const [searchInterval,setSearchInterval] = useState(null as any);
     const [isCreateingRomm, setIsCreateingRomm] = useState(false);
     const [room,setRoom] = useState(null as any);
+    const [isEmoteDropDownOpen, setIsEmoteDropDownOpen] = useState(false);
+    const [rooms, setRooms] = useState(null as unknown as any[]);
     const upload = async(file:any) => {
         const formData = new FormData();
         formData.append('file',file);
@@ -43,6 +46,21 @@ export default function Home(){
         setPreventComment(false);
         setVisibility(0);
     }
+    useEffect(() => {
+        if (ACCESS_TOKEN) {
+            fetchUser()
+            .then((response) => {
+                setUser(response);
+                getRooms({username:response.username})
+                .then(response => {
+                    setRooms(response);
+                }).catch(error=> console.log(error));
+            }).catch((error) => {
+                console.log(error);
+            });
+        } else
+            redirect('/account/login');
+    }, [ACCESS_TOKEN]);
     function Profile() {
         return (
             <div className='avatar w-[44px] h-[44px]'>
@@ -72,17 +90,6 @@ export default function Home(){
         return <img src='/commons/logo_small.png' className='w-[44px] h-[44px]' alt='logo small'/>;
     }
 
-    useEffect(() => {
-        if (ACCESS_TOKEN) {
-            fetchUser()
-            .then((response) => {
-                setUser(response);
-            }).catch((error) => {
-                console.log(error);
-            });
-        } else
-            redirect('/account/login');
-    }, [ACCESS_TOKEN]);
     function openMessage(){
         setIsMessageModalOpen(true);
     }
@@ -95,7 +102,15 @@ export default function Home(){
                         <img src={user?.profileImage} className='m-5 w-24 rounded-full' style={{width:74+'px',height:74+'px'}}/>
                         <label className='font-bold text-lg p-5'>메시지</label>
                         <div className='m-5'>
-
+                            {rooms?.map((r,index)=>
+                                <div key={index} className="flex cursor-pointer" onClick={()=>setRoom(r)}>
+                                    <img className="rounded-full" style={{width:44+'px',height:44+'px'}} src={r.roomType=='GROUP'?'/commons/group.png':(r.roomType=='SELF'?r.owner.profileImage:r.participants.filter((p:any)=>{if(p.username!= user.username) return p})[0].profileImage)} />
+                                    <div className="flex flex-col">
+                                        <label className="ml-2 font-bold cursor-pointer" onClick={()=>setRoom(r)}>{r.roomType=='GROUP'?r.name:(r.roomType=='SELF'?r.owner.nickname : r.participants.filter((p:any)=>{if(p.username!=user.username)return p})[0].nickname)}</label>
+                                        <label className="ml-2 text-sm text-gray-400 cursor-pointer" onClick={()=>setRoom(r)}>{Days({dateTime: r.roomType=='GROUP'? r.modifyDate : (r.roomType=='SELF'?Date():r.participants.filter((p:any)=>{if(p.username!=user.username)return p})[0].activeDate)})}분전 활동</label>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -138,10 +153,10 @@ export default function Home(){
         }
     }
     function CreateRoom(){
-        const data = selectedUsers?.map(user=>user.username) as string[];
+        const data = selectedUsers?.map(user=>user.username as string) as string[];
         if(data&&!isCreateingRomm){
             setIsCreateingRomm(true);
-            createRoom(data).then(response => {
+            createRoom({participants:[...data,user.username]}).then(response => {
                 if(isMessageModalOpen)
                     setRoom(response);
                 setIsMessageModalOpen(false);
@@ -160,6 +175,7 @@ export default function Home(){
         setSearchedUsers(null as unknown as any[]);
         setIsCreateingRomm(false);
     }
+    
     return ( 
     <main className="flex">
         <p className={'h-screen min-w-[500px]'}></p>
@@ -238,14 +254,6 @@ export default function Home(){
                                         <label className='text-red-400 w-[40px] items-center mt-4 ml-4 cursor-pointer' onClick={() => setIsArticleModalOpen(true) }>취소</label>
                                         <label className='font-bold text-lg w-full h-[24px] text-center mt-4'>새 게시물 만들기</label>
                                         <label className='text-blue-400 w-[80px] mt-4 mr-4 cursor-pointer font-bold' onClick={()=>{
-                                            console.log({
-                                                content,
-                                                tags,
-                                                visibility,
-                                                hideLoveAndShow,
-                                                preventComment,
-                                                articleTempImage
-                                            });
                                         writeArticle({content,tags,visibility,hideLoveAndShow,preventComment,img_url:articleTempImage});
                                         setIsModalOpen(false);
                                         }} >공유하기</label>
@@ -361,7 +369,7 @@ export default function Home(){
             {status!=0?<div className={'fixed right-0 h-screen z-[5]'} style={{width:(window.innerWidth-515+'px')}} onClick={()=>setStatus(0)}></div>:null}
         <div className="main w-full">
         {
-        status==0?
+        !room?
             <div className="h-full w-full flex flex-col items-center justify-center">
                 <img src="/commons/my_message.png" style={{width:96+'px',height:96+'px'}}/>
                 <label className="text-2xl p-3">내 메시지</label>
@@ -369,7 +377,27 @@ export default function Home(){
                 <button className="btn btn-info text-white btn-sm m-5" onClick={()=>openMessage()}>메시지 보내기</button>
             </div>
         :
-            <></>
+            <div className="flex flex-col relative" id="m_pbg">
+                <div className="ml-5 my-3 flex items-center">
+                    <img className="rounded-full" style={{width:44+'px',height:44+'px'}} src={room.roomType=='GROUP'?'/commons/group.png':(room.roomType=='SELF'?room.owner.profileImage:room.participants.filter((p:any)=>{if(p.username!= user.username) return p})[0].profileImage)} />
+                    <label className="ml-2 font-bold">{room.roomType=='GROUP'?room.name:(room.roomType=='SELF'?room.owner.nickname : room.participants.filter((p:any)=>{if(p.username!=user.username)return p})[0].nickname)}</label>
+                </div>
+                <div className="divider my-0"></div>
+                <div className="flex flex-col" style={{width:1400+'px',height:800+'px'}}>
+                    {(room.chats as any[]).map((chat,index)=>
+                        <div key={index} onClick={()=>console.log(chat)}>
+                            test123123
+                        </div>
+                    )}
+                </div>
+                <EmoteDropDown input_id='message_text' open={isEmoteDropDownOpen} setIsOpen={(v:boolean)=>setIsEmoteDropDownOpen(v)} onClick={()=>{}} background='m_pbg' button='m_eb'/>
+                <div className="flex items-center rounded-full border border-black mx-4 px-4" style={{height:44+'px'}}>
+                    <EmoteButton className="w-[24px] h-[24px]" id="m_eb" open={isEmoteDropDownOpen} setIsOpen={setIsEmoteDropDownOpen}/>
+                    <textarea autoFocus id="message_text" className="outline-none ml-2 break-words w-full resize-none" rows={1} placeholder="메시지 입력..." />
+                    <label className="min-w-[55px] h-[18px] text-blue-500 hover:text-black cursor-pointer">보내기</label>
+                </div>
+                
+            </div>
         }
       </div>    
     </main>);

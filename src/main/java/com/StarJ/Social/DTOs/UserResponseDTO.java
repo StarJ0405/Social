@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.ZoneId;
 import java.util.List;
 
 @Getter
@@ -23,7 +24,7 @@ public class UserResponseDTO {
     private List<FollowResponseDTO> followers;
     private List<FollowResponseDTO> followings;
     private int articleCount;
-
+    private Long activeDate;
     @Builder
     public UserResponseDTO(SiteUser user, LocalFile file, List<FollowResponseDTO> followers, List<FollowResponseDTO> followings, int articleCount) {
         this.username = user.getUsername();
@@ -36,5 +37,6 @@ public class UserResponseDTO {
         this.followers = followers;
         this.followings = followings;
         this.articleCount = articleCount;
+        this.activeDate= user.getActiveDate().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 }

@@ -34,7 +34,8 @@ interface ButtonProps{
     open:boolean;
     id: string;
     setIsOpen: (v:boolean) => void;
+    className?: string;
 }
 export function EmoteButton(props:ButtonProps){
-    return <><button id={props.id} onClick={()=>props.setIsOpen(!props.open)}>😀</button></>;
+    return <><button className={props.className} id={props.id} onClick={()=>props.setIsOpen(!props.open)}>😀</button></>;
 }

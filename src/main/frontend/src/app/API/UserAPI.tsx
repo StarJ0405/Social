@@ -116,8 +116,17 @@ export const follow = async(data:FollwoProps)=>{
     const response = await UserApi.post('/api/user/follow',data);
     return response.data;
 }
-
-export const createRoom = async(data:string[])=>{
+interface CreateRoomPorps{
+    participants:string[];
+}
+export const createRoom = async(data:CreateRoomPorps)=>{
     const response = await UserApi.post('/api/chat/createRoom',data);
+    return response.data;
+}
+interface RoomsProps{
+    username:string;
+}
+export const getRooms = async(data:RoomsProps)=>{
+    const response = await UserApi.get('/api/chat/rooms');
     return response.data;
 }

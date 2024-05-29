@@ -288,7 +288,7 @@ export default function CSR_PAGE(props : pageProps){
                                             <div className='p-2 flex relative'>
                                                 <img id={'cb'+index} src={comment.user.profileImage} className='rounded-full w-[44px] h-[44px] cursor-pointer' onMouseEnter={()=>OpenHoverDropDown(comment.user,'pbg','cb'+index)} onMouseLeave={()=>CloseHoverDropDown()} onClick={()=>{if(comment.user.username != owner.username)window.location.href='/'+comment.user.username;}}/> 
                                                 <div className='flex w-[456px] flex-col justify-center p-2'>
-                                                    <div><label className='font-bold cursor-pointer]' onMouseEnter={()=>OpenHoverDropDown(comment.user, 'pbg','cb'+index)} onMouseLeave={()=>CloseHoverDropDown()}>{comment.user.nickname}</label></div>
+                                                    <div><label className='font-bold cursor-pointer' onMouseEnter={()=>OpenHoverDropDown(comment.user, 'pbg','cb'+index)} onMouseLeave={()=>CloseHoverDropDown()}>{comment.user.nickname}</label></div>
                                                     <label className='w-[400px] break-words'>{comment.comment}</label>
                                                     <label className='text-xs'><Days dateTime={comment.dateTime}/> </label>
                                                 </div>

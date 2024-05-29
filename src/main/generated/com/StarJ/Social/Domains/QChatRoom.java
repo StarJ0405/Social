@@ -22,11 +22,21 @@ public class QChatRoom extends EntityPathBase<ChatRoom> {
 
     public static final QChatRoom chatRoom = new QChatRoom("chatRoom");
 
+    public final ListPath<ChatMessage, QChatMessage> chatMessages = this.<ChatMessage, QChatMessage>createList("chatMessages", ChatMessage.class, QChatMessage.class, PathInits.DIRECT2);
+
     public final DateTimePath<java.time.LocalDateTime> createDate = createDateTime("createDate", java.time.LocalDateTime.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final DateTimePath<java.time.LocalDateTime> modifyDate = createDateTime("modifyDate", java.time.LocalDateTime.class);
+
+    public final StringPath name = createString("name");
+
     public final QSiteUser owner;
+
+    public final ListPath<ChatParticipant, QChatParticipant> participants = this.<ChatParticipant, QChatParticipant>createList("participants", ChatParticipant.class, QChatParticipant.class, PathInits.DIRECT2);
+
+    public final EnumPath<com.StarJ.Social.Enums.RoomType> roomType = createEnum("roomType", com.StarJ.Social.Enums.RoomType.class);
 
     public QChatRoom(String variable) {
         this(ChatRoom.class, forVariable(variable), INITS);

@@ -21,9 +21,6 @@ import java.util.UUID;
 public class LocalFileService {
     private final LocalFileRepository localFileRepository;
 
-    //    public LocalFile get(String key){
-//        return localFileRepository.findById(key).orElseThrow( () -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다. key = " + key));
-//    }
     public LocalFile getNullable(String key) {
         return localFileRepository.findById(key).orElse(null);
     }

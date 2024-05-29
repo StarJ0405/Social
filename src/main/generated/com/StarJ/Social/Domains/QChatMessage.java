@@ -22,6 +22,8 @@ public class QChatMessage extends EntityPathBase<ChatMessage> {
 
     public static final QChatMessage chatMessage = new QChatMessage("chatMessage");
 
+    public final ListPath<ChatImage, QChatImage> chatImages = this.<ChatImage, QChatImage>createList("chatImages", ChatImage.class, QChatImage.class, PathInits.DIRECT2);
+
     public final QChatRoom chatRoom;
 
     public final DateTimePath<java.time.LocalDateTime> createDate = createDateTime("createDate", java.time.LocalDateTime.class);

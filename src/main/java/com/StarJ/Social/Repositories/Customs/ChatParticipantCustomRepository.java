@@ -6,6 +6,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ChatParticipantCustomRepository {
-    Optional<ChatParticipant> get(String username);
-    List<ChatParticipant> getList(Long chatRoom_id);
+    List<ChatParticipant> getList(Long room_id);
 }

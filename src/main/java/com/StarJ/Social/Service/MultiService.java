@@ -3,6 +3,7 @@ package com.StarJ.Social.Service;
 import com.StarJ.Social.DTOs.*;
 import com.StarJ.Social.Domains.*;
 import com.StarJ.Social.Enums.LocalFileKeywords;
+import com.StarJ.Social.Enums.RoomType;
 import com.StarJ.Social.Records.TokenRecord;
 import com.StarJ.Social.Securities.CustomUserDetails;
 import com.StarJ.Social.Securities.JWT.JwtTokenProvider;
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -82,6 +84,7 @@ public class MultiService {
         if (this.authService.isExist(user)) {
             user.getAuth().setAccessToken(accessToken);
             user.getAuth().setRefreshToken(refreshToken);
+            userService.updateActive(user);
             return new AuthResponseDTO(user.getAuth());
         }
         return new AuthResponseDTO(authService.save(user, accessToken, refreshToken));
@@ -99,26 +102,26 @@ public class MultiService {
         return getUserResponseDTO(userService.get(username));
     }
 
-    public List<UserResponseDTO> getUserResponseDTOs(String like,String username) {
+    public List<UserResponseDTO> getUserResponseDTOs(String like, String username) {
         List<UserResponseDTO> list = new ArrayList<>();
-        for (SiteUser user : userService.getList(like,username))
+        for (SiteUser user : userService.getList(like, username))
             list.add(getUserResponseDTO(user));
         return list;
     }
 
     public UserResponseDTO getUserResponseDTO(SiteUser user) {
-        return UserResponseDTO                                                              //
-                .builder()                                                              //
-                .user(user)                                                             //
-                .file(this.localFileService                                             //
-                        .getNullable(LocalFileKeywords                                  //
-                                .profileImage                                           //
-                                .getValue(user                                          //
-                                        .getUsername())))                               //
-                .followers(this.followService.getFollowers(user))                       //
-                .followings(this.followService.getFollowings(user))                     //
+        return UserResponseDTO                                                                    //
+                .builder()                                                                        //
+                .user(user)                                                                       //
+                .file(this.localFileService                                                       //
+                        .getNullable(LocalFileKeywords                                            //
+                                .profileImage                                                     //
+                                .getValue(user                                                    //
+                                        .getUsername())))                                         //
+                .followers(this.followService.getFollowers(user))                                 //
+                .followings(this.followService.getFollowings(user))                               //
                 .articleCount(this.articleService.getList(user.getUsername(), 0).size())   //
-                .build();                                                               //
+                .build();                                                                         //
     }
 
     @Transactional
@@ -271,26 +274,97 @@ public class MultiService {
             return true;
         }
     }
+
     /**
      * 채팅
      */
     @Transactional
     public ChatRoomResponseDTO createChatRoom(String username, List<String> participants_name) {
         SiteUser owner = userService.get(username);
-        ChatRoom room = chatRoomService.create(owner);
-        List<UserResponseDTO> participants = new ArrayList<>();
-        for(String name :participants_name) {
-            SiteUser participant = userService.get(name);
-            chatParticipantService.create(room, participant);
-            participants.add(getUserResponseDTO(participant));
+        if (participants_name.size() == 1) {
+            // participants_name.size() == 1 자기 자신
+            ChatRoom room = chatRoomService.getSelf(owner).orElseGet(() -> chatRoomService.create(owner, RoomType.SELF));
+            List<UserResponseDTO> participants = new ArrayList<>();
+            for (String name : participants_name) {
+                SiteUser participant = userService.get(name);
+                chatParticipantService.create(room, participant);
+                participants.add(getUserResponseDTO(participant));
+            }
+            return ChatRoomResponseDTO.builder().modifyDate(room.getModifyDate()).name(room.getName()).roomType(room.getRoomType()).owner(getUserResponseDTO(room.getOwner())).participants(participants).chats(new ArrayList<>()).build();
+        } else if (participants_name.size() == 2) {
+            // participants_name.size() == 2 친구
+            SiteUser user2 = userService.get(participants_name.stream().filter(p -> !p.equals(username)).toList().getFirst());
+            ChatRoom room = chatRoomService.getPersonal(owner, user2).orElseGet(() -> chatRoomService.create(null, RoomType.PERSONAL));
+            List<UserResponseDTO> participants = new ArrayList<>();
+            for (String name : participants_name) {
+                SiteUser participant = userService.get(name);
+                chatParticipantService.create(room, participant);
+                participants.add(getUserResponseDTO(participant));
+            }
+            return ChatRoomResponseDTO.builder().modifyDate(room.getModifyDate()).name(room.getName()).roomType(room.getRoomType()).participants(participants).chats(new ArrayList<>()).build();
+        } else {
+            // participants_name.size() >= 3 그룹
+            ChatRoom room = chatRoomService.create(owner, RoomType.GROUP);
+            List<UserResponseDTO> participants = new ArrayList<>();
+            for (String name : participants_name) {
+                SiteUser participant = userService.get(name);
+                chatParticipantService.create(room, participant);
+                participants.add(getUserResponseDTO(participant));
+            }
+            return ChatRoomResponseDTO.builder().modifyDate(room.getModifyDate()).name(room.getName()).roomType(room.getRoomType()).owner(getUserResponseDTO(room.getOwner())).participants(participants).chats(new ArrayList<>()).build();
         }
-        return ChatRoomResponseDTO.builder().owner(getUserResponseDTO(owner)).participants(participants).chats(new ArrayList<>()).build();
     }
+
     @Transactional
-    public ChatMessage createChat(Long room_id,String sender_name, String message){
+    public void saveChat(Long room_id, String sender_name, String message, String[] urls, LocalDateTime createDate) {
+        ChatRoom chatRoom = chatRoomService.get(room_id);
+        SiteUser sender = userService.get(sender_name);
+        ChatMessage chatMessage = chatMessageService.Create(chatRoom, sender, message);
+        for (String url : urls)
+            chatImageService.create(chatMessage, url);
+
+    }
+
+    public ChatRoomResponseDTO getRoom(ChatRoom room) {
+        List<UserResponseDTO> participants = new ArrayList<>();
+        for (ChatParticipant chatParticipant : room.getParticipants())
+            participants.add(getUserResponseDTO(chatParticipant.getParticipant()));
+        List<ChatMessageDTO> chats = new ArrayList<>();
+        for (ChatMessage message : room.getChatMessages())
+            chats.add(ChatMessageDTO.builder().sender(getUserResponseDTO(message.getSender())).chatMessage(message).imageList(message.getChatImages()).build());
+        return ChatRoomResponseDTO.builder().modifyDate(room.getModifyDate()).name(room.getName()).roomType(room.getRoomType()).owner(room.getOwner() == null ? null : getUserResponseDTO(room.getOwner())).participants(participants).chats(chats).build();
+    }
+
+    public List<ChatRoomResponseDTO> getRooms(String username) {
+        List<ChatRoomResponseDTO> list = new ArrayList<>();
+        for (ChatRoom room : chatRoomService.getList(username))
+            list.add(getRoom(room));
+        return list;
+    }
+
+    @Transactional
+    public ChatMessage createChat(Long room_id, String sender_name, String message) {
         SiteUser sender = userService.get(sender_name);
         ChatRoom room = chatRoomService.get(room_id);
-        return chatMessageService.Create(room,sender,message);
+        return chatMessageService.Create(room, sender, message);
+    }
+
+    @Transactional
+    public String saveChatTempImage(Long room_id, String sender_name,byte[] imageBytes) {
+        try {
+            String key = LocalFileKeywords.messageTempImage.getValue(room_id.toString());
+//            localFileService.deleteWithFile(key);
+//            String path = SocialApplication.getOS_TYPE().getPath();
+//            String filename = "/users/" + username + "/" + UUID.randomUUID().toString() + "." + image.getContentType().split("/")[1];
+//            File file = new File(path + filename);
+//            if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
+//            image.transferTo(file);
+//            localFileService.save(key, filename);
+//            return filename;
+            return "";
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
