@@ -1,16 +1,8 @@
 package com.StarJ.Social.Controllers;
 
-import com.StarJ.Social.DTOs.ChatMessageDTO;
-import com.StarJ.Social.DTOs.ChatRoomRequestDTO;
-import com.StarJ.Social.DTOs.ChatRoomResponseDTO;
-import com.StarJ.Social.DTOs.ImageDto;
-import com.StarJ.Social.Domains.ChatImage;
-import com.StarJ.Social.Domains.ChatMessage;
-import com.StarJ.Social.Domains.ChatRoom;
-import com.StarJ.Social.Domains.SiteUser;
+import com.StarJ.Social.DTOs.*;
 import com.StarJ.Social.Records.TokenRecord;
 import com.StarJ.Social.Service.MultiService;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.http.ResponseEntity;
@@ -20,14 +12,11 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,11 +24,12 @@ import java.util.UUID;
 public class ChatController {
     private final MultiService multiService;
     private Map<Integer, String> imageChunksMap = new HashMap<>();
+
     @MessageMapping("/talk/{id}")
     @SendTo("/sub/talk/{id}")
-    public ChatMessageDTO message(@DestinationVariable("id") Long room_id, ChatMessageDTO message) throws Exception {
-        multiService.saveChat(room_id, message.getSender().getUsername(), message.getMessage(), message.getUrls(), message.getCreateDate());
-        return message;
+    public ChatResponseMessageDTO message(@DestinationVariable("id") Long room_id, ChatRequestMessageDTO message) throws Exception {
+        multiService.saveChat(room_id, message.getSender(), message.getMessage(), message.getUrls(), message.getCreateDate());
+        return multiService.transferMessage(message);
     }
 
     @PostMapping("/createRoom")
@@ -75,7 +65,7 @@ public class ChatController {
 //                FileOutputStream fos = new FileOutputStream(file);
 //                fos.write(completeImageBytes);
 //                fos.close();
-                String loc = this.multiService.saveChatTempImage(image.getChatroomId(),image.getSender(),completeImageBytes);
+                String loc = this.multiService.saveChatTempImage(image.getChatroomId(), image.getSender(), completeImageBytes);
                 imageChunksMap.clear();
 
 //                ChatRoom chatRoom = chatRoomRepository.findById(image.getChatroomId());

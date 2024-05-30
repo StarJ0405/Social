@@ -25,4 +25,7 @@ public class FollowResponseDTO {
     public void setDateTime(LocalDateTime dateTime) {
         this.dateTime = dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
+    public void setDateTime(Long dateTime) {
+        this.dateTime = dateTime;
+    }
 }

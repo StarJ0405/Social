@@ -1,15 +1,18 @@
 "use client"
-import { useEffect, useState } from "react";
+import { InputHTMLAttributes, useEffect, useState } from "react";
 import { createRoom, fetchUser, getRooms, saveArticleTempImage, writeArticle } from "../api/UserAPI";
 import { redirect } from 'next/navigation';
 import Modal from "../global/Modal";
 import { EmoteButton, EmoteDropDown } from "../global/Emotes";
 import { fetchnonUsers } from "../API/NonUserAPI";
-import { Days } from "../[username]/CSR";
+import { Days, GetDate } from "../[username]/CSR";
+import { unsubscribe, getSocket, subscribe, publish  } from "../API/SocketAPI";
+
 
 
 
 export default function Home(){
+    const [Socket, setSocket] = useState(null as unknown as any);
     const [status, setStatus] = useState(0);
     const [isDrag, setIsDrag] = useState(false);
     const [isTagOpen, setIsTagOpen] = useState(false);
@@ -33,6 +36,7 @@ export default function Home(){
     const [room,setRoom] = useState(null as any);
     const [isEmoteDropDownOpen, setIsEmoteDropDownOpen] = useState(false);
     const [rooms, setRooms] = useState(null as unknown as any[]);
+
     const upload = async(file:any) => {
         const formData = new FormData();
         formData.append('file',file);
@@ -46,6 +50,9 @@ export default function Home(){
         setPreventComment(false);
         setVisibility(0);
     }
+    useEffect(()=>{
+        setSocket(getSocket());
+    },[]);
     useEffect(() => {
         if (ACCESS_TOKEN) {
             fetchUser()
@@ -61,6 +68,12 @@ export default function Home(){
         } else
             redirect('/account/login');
     }, [ACCESS_TOKEN]);
+    function SetRoom(newRoom:any){
+        if(room)
+            unsubscribe(Socket,'/sub/talk/'+room.id);
+        setRoom(newRoom)
+        subscribe(Socket,'/sub/talk/'+newRoom.id,()=>{ console.log(newRoom.id)});
+    }
     function Profile() {
         return (
             <div className='avatar w-[44px] h-[44px]'>
@@ -93,21 +106,22 @@ export default function Home(){
     function openMessage(){
         setIsMessageModalOpen(true);
     }
+
     function Extra(){
         return (
             status==0?
-                <div className='h-screen border-r-2 flex flex-col justify-start w-full'>
+                <div className='h-screen border-r-2 flex flex-col justify-start w-full bg-white'>
                     <div className='flex justify-between m-8 mb-5 items-center'><label className='text-4xl font-bold'>{user?.username}</label> <img src='/commons/open_message.png' className='cursor-pointer' onClick={()=>openMessage()} style={{width:24+'px',height:24+'px'}}/></div>
                     <div className='overflow-y-scroll felx flex-col h-full'>
                         <img src={user?.profileImage} className='m-5 w-24 rounded-full' style={{width:74+'px',height:74+'px'}}/>
                         <label className='font-bold text-lg p-5'>메시지</label>
                         <div className='m-5'>
                             {rooms?.map((r,index)=>
-                                <div key={index} className="flex cursor-pointer" onClick={()=>setRoom(r)}>
+                                <div key={index} className="flex cursor-pointer" onClick={()=>SetRoom(r)}>
                                     <img className="rounded-full" style={{width:44+'px',height:44+'px'}} src={r.roomType=='GROUP'?'/commons/group.png':(r.roomType=='SELF'?r.owner.profileImage:r.participants.filter((p:any)=>{if(p.username!= user.username) return p})[0].profileImage)} />
                                     <div className="flex flex-col">
-                                        <label className="ml-2 font-bold cursor-pointer" onClick={()=>setRoom(r)}>{r.roomType=='GROUP'?r.name:(r.roomType=='SELF'?r.owner.nickname : r.participants.filter((p:any)=>{if(p.username!=user.username)return p})[0].nickname)}</label>
-                                        <label className="ml-2 text-sm text-gray-400 cursor-pointer" onClick={()=>setRoom(r)}>{Days({dateTime: r.roomType=='GROUP'? r.modifyDate : (r.roomType=='SELF'?Date():r.participants.filter((p:any)=>{if(p.username!=user.username)return p})[0].activeDate)})}분전 활동</label>
+                                        <label className="ml-2 font-bold cursor-pointer" onClick={()=>SetRoom(r)}>{r.roomType=='GROUP'?r.name:(r.roomType=='SELF'?r.owner.nickname : r.participants.filter((p:any)=>{if(p.username!=user.username)return p})[0].nickname)}</label>
+                                        <label className="ml-2 text-sm text-gray-400 cursor-pointer" onClick={()=>SetRoom(r)}>{Days({dateTime: r.roomType=='GROUP'? r.modifyDate : (r.roomType=='SELF'?Date():r.participants.filter((p:any)=>{if(p.username!=user.username)return p})[0].activeDate)})} 활동</label>
                                     </div>
                                 </div>
                             )}
@@ -175,7 +189,20 @@ export default function Home(){
         setSearchedUsers(null as unknown as any[]);
         setIsCreateingRomm(false);
     }
-    
+    function Send(){
+        const text = (document.getElementById('message_text') as HTMLInputElement);
+        publish(Socket, '/pub/talk/'+room.id, {sender: user.username ,message: text.value,urls: [] as String[],createDate: new Date()});
+        
+        
+        const newChat = [ ...room.chats,{sender: user, message:text.value, urls:[], createDate:new Date()}]
+        room.chats = newChat;
+        console.log(room);
+        setRoom(room);
+        text.value=''; 
+
+    }
+
+
     return ( 
     <main className="flex">
         <p className={'h-screen min-w-[500px]'}></p>
@@ -386,7 +413,22 @@ export default function Home(){
                 <div className="flex flex-col" style={{width:1400+'px',height:800+'px'}}>
                     {(room.chats as any[]).map((chat,index)=>
                         <div key={index} onClick={()=>console.log(chat)}>
-                            test123123
+                            {chat.sender.username == user.username?
+                                <div className="flex justify-end mr-2">
+                                    <div className="flex flex-col">
+                                        <label className="rounded-l-full text-lg bg-blue-500 text-white px-5">{chat.message}</label>
+                                        <label className="text-gray-500 text-sm">{GetDate({dateTime:chat.createDate})}</label>
+                                    </div>
+                                </div>
+                            :
+                                <div className="flex justify-start m-2">
+                                    <img className="rounded-full" src={chat.sender.profileImage} style={{width:44+'px',height:44+'px'}}/>
+                                    <div className="flex flex-col m-2">
+                                        <label className="rounded-full text-lg bg-blue-500 text-white px-5">{chat.message}</label>
+                                        <label className="text-gray-500 text-sm">{GetDate({dateTime:chat.createDate})}</label>
+                                    </div>
+                                </div>
+                            }
                         </div>
                     )}
                 </div>
@@ -394,9 +436,8 @@ export default function Home(){
                 <div className="flex items-center rounded-full border border-black mx-4 px-4" style={{height:44+'px'}}>
                     <EmoteButton className="w-[24px] h-[24px]" id="m_eb" open={isEmoteDropDownOpen} setIsOpen={setIsEmoteDropDownOpen}/>
                     <textarea autoFocus id="message_text" className="outline-none ml-2 break-words w-full resize-none" rows={1} placeholder="메시지 입력..." />
-                    <label className="min-w-[55px] h-[18px] text-blue-500 hover:text-black cursor-pointer">보내기</label>
+                    <label className="min-w-[55px] h-[18px] text-blue-500 hover:text-black cursor-pointer" onClick={Send }>보내기</label>
                 </div>
-                
             </div>
         }
       </div>    

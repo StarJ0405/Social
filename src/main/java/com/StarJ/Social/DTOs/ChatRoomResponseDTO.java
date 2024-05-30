@@ -11,15 +11,17 @@ import java.util.List;
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatRoomResponseDTO {
+    private Long id;
     private String name;
     private String roomType;
     private UserResponseDTO owner;
     private UserResponseDTO[] participants;
-    private List<ChatMessageDTO> chats;
+    private List<ChatResponseMessageDTO> chats;
     private Long modifyDate;
 
     @Builder
-    public ChatRoomResponseDTO(LocalDateTime modifyDate, String name, RoomType roomType, UserResponseDTO owner, List<UserResponseDTO> participants, List<ChatMessageDTO> chats) {
+    public ChatRoomResponseDTO(Long id, LocalDateTime modifyDate, String name, RoomType roomType, UserResponseDTO owner, List<UserResponseDTO> participants, List<ChatResponseMessageDTO> chats) {
+        this.id = id;
         this.name = name;
         this.roomType = roomType.name();
         this.owner = owner;

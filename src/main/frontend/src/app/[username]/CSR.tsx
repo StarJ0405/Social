@@ -36,7 +36,7 @@ export function Days({dateTime}:{dateTime:number}){
         msg= Math.floor(result/60)+'분 전';
     else if(result < 60*60*24)
         msg= Math.floor(result/60/60)+'시간 전';
-    else if(result < 60*60*24/14)
+    else if(result < 60*60*24*14)
         msg= Math.floor(result/60/60/24)+'일 전';
     else 
         msg= Math.floor(result/60/60/24/7)+'주 전';

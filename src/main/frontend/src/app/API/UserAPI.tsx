@@ -130,3 +130,12 @@ export const getRooms = async(data:RoomsProps)=>{
     const response = await UserApi.get('/api/chat/rooms');
     return response.data;
 }
+interface RoomProps{
+    room_id:number
+}
+export const getRoom = async(data:RoomProps)=>{
+    const response = await UserApi.get('/api/room',{headers: {
+        'RoomId': data.room_id
+    }});
+    return response.data;
+}
