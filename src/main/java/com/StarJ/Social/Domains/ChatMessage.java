@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -29,5 +30,6 @@ public class ChatMessage {
         this.sender = sender;
         this.message = message;
         this.createDate = LocalDateTime.now();
+        this.chatImages = new ArrayList<>();
     }
 }

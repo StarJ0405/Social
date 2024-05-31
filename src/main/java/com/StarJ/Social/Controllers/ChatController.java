@@ -27,9 +27,9 @@ public class ChatController {
 
     @MessageMapping("/talk/{id}")
     @SendTo("/sub/talk/{id}")
-    public ChatResponseMessageDTO message(@DestinationVariable("id") Long room_id, ChatRequestMessageDTO message) throws Exception {
-        multiService.saveChat(room_id, message.getSender(), message.getMessage(), message.getUrls(), message.getCreateDate());
-        return multiService.transferMessage(message);
+    public List<ChatRoomResponseDTO> message(@DestinationVariable("id") Long room_id, ChatRequestMessageDTO message) throws Exception {
+        List<ChatRoomResponseDTO> list =multiService.saveChat(room_id, message.getSender(), message.getMessage(), message.getUrls(), message.getCreateDate());
+        return list;
     }
 
     @PostMapping("/createRoom")

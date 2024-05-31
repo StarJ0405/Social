@@ -13,7 +13,7 @@ public class SocialApplication {
 
     public static void main(String[] args) {
         OS_TYPE = OSType.getInstance();
-        if (!OS_TYPE.equals(OSType.ETC))
+        if (OS_TYPE != null)
             SpringApplication.run(SocialApplication.class, args);
         else
             throw new DataNotFoundException("OS 정보를 불러오지 못했습니다.");

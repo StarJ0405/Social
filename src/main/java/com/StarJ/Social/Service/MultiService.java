@@ -317,14 +317,24 @@ public class MultiService {
     }
 
     @Transactional
-    public void saveChat(Long room_id, String sender_name, String message, String[] urls, LocalDateTime createDate) {
-        ChatRoom chatRoom = chatRoomService.get(room_id);
-        SiteUser sender = userService.get(sender_name);
-        ChatMessage chatMessage = chatMessageService.Create(chatRoom, sender, message);
-        for (String url : urls)
-            chatImageService.create(chatMessage, url);
+    public List<ChatRoomResponseDTO> saveChat(Long room_id, String sender_name, String message, String[] urls, LocalDateTime createDate) {
+        List<ChatRoomResponseDTO> list = new ArrayList<>();
+        List<ChatRoom> rooms = chatRoomService.getList(sender_name);
+        for(ChatRoom chatRoom : rooms) {
+            if(chatRoom.getId().equals(room_id)) {
+                SiteUser sender = userService.get(sender_name);
+                ChatMessage chatMessage = chatMessageService.Create(chatRoom, sender, message);
+                for (String url : urls)
+                    chatImageService.create(chatMessage, url);
+                chatRoomService.updateModifyDate(chatRoom);
+                userService.updateActive(sender);
+            }
+            list.add(getRoom(chatRoom));
+        }
 
+        return list;
     }
+
 
     public ChatRoomResponseDTO getRoom(ChatRoom room) {
         List<UserResponseDTO> participants = new ArrayList<>();
@@ -332,7 +342,7 @@ public class MultiService {
             participants.add(getUserResponseDTO(chatParticipant.getParticipant()));
         List<ChatResponseMessageDTO> chats = new ArrayList<>();
         for (ChatMessage message : room.getChatMessages())
-            chats.add(ChatResponseMessageDTO.builder().sender(getUserResponseDTO(message.getSender())).message(message.getMessage()).urls(message.getChatImages().stream().map(image -> image.getUrl()).toArray(String[]::new)).createDate(message.getCreateDate()).build());
+            chats.add(ChatResponseMessageDTO.builder().sender(getUserResponseDTO(message.getSender())).message(message.getMessage()).urls(message.getChatImages()==null?new String[0] :message.getChatImages().stream().map(image -> image.getUrl()).toArray(String[]::new)).createDate(message.getCreateDate()).build());
         return ChatRoomResponseDTO.builder().id(room.getId()).modifyDate(room.getModifyDate()).name(room.getName()).roomType(room.getRoomType()).owner(room.getOwner() == null ? null : getUserResponseDTO(room.getOwner())).participants(participants).chats(chats).build();
     }
 
@@ -369,10 +379,7 @@ public class MultiService {
         }
     }
 
-    public ChatResponseMessageDTO transferMessage(ChatRequestMessageDTO chatRequestMessageDTO) {
-        return ChatResponseMessageDTO.builder().sender(getUserResponseDTO(chatRequestMessageDTO.getSender())).message(chatRequestMessageDTO.getMessage()).urls(chatRequestMessageDTO.getUrls()).createDate(chatRequestMessageDTO.getCreateDate()).build();
-    }
-    public ChatRoomResponseDTO getRoom(Long room_id){
+    public ChatRoomResponseDTO getRoom(Long room_id) {
         return getRoom(chatRoomService.get(room_id));
     }
 }

@@ -1,12 +1,12 @@
-"use client"
-import { InputHTMLAttributes, useEffect, useState } from "react";
-import { createRoom, fetchUser, getRooms, saveArticleTempImage, writeArticle } from "../api/UserAPI";
+'use client'
+import { InputHTMLAttributes, useEffect, useState } from 'react';
+import { createRoom, fetchUser, getRooms, saveArticleTempImage, writeArticle } from '../api/UserAPI';
 import { redirect } from 'next/navigation';
-import Modal from "../global/Modal";
-import { EmoteButton, EmoteDropDown } from "../global/Emotes";
-import { fetchnonUsers } from "../API/NonUserAPI";
-import { Days, GetDate } from "../[username]/CSR";
-import { unsubscribe, getSocket, subscribe, publish  } from "../API/SocketAPI";
+import Modal from '../global/Modal';
+import { EmoteButton, EmoteDropDown } from '../global/Emotes';
+import { fetchnonUsers } from '../API/NonUserAPI';
+import { Days, GetDate } from '../[username]/CSR';
+import { unsubscribe, getSocket, subscribe, publish  } from '../API/SocketAPI';
 
 
 
@@ -36,7 +36,7 @@ export default function Home(){
     const [room,setRoom] = useState(null as any);
     const [isEmoteDropDownOpen, setIsEmoteDropDownOpen] = useState(false);
     const [rooms, setRooms] = useState(null as unknown as any[]);
-
+    const [replaceRoom, setReplaceRoom] = useState(null as any);
     const upload = async(file:any) => {
         const formData = new FormData();
         formData.append('file',file);
@@ -50,14 +50,13 @@ export default function Home(){
         setPreventComment(false);
         setVisibility(0);
     }
-    useEffect(()=>{
-        setSocket(getSocket());
-    },[]);
+
     useEffect(() => {
         if (ACCESS_TOKEN) {
             fetchUser()
             .then((response) => {
                 setUser(response);
+                setSocket(getSocket(response.username));
                 getRooms({username:response.username})
                 .then(response => {
                     setRooms(response);
@@ -68,11 +67,30 @@ export default function Home(){
         } else
             redirect('/account/login');
     }, [ACCESS_TOKEN]);
+    useEffect(()=>{
+        if(room?.id==replaceRoom?.id){
+            setRoom(replaceRoom)
+            setReplaceRoom(null)
+            const time = setInterval(()=>{
+                const element = document.getElementById('chatSpace');
+                if(element)
+                    element.scrollTop = element.scrollHeight+9999;
+                clearInterval(time);
+            },10)
+        }
+    },[replaceRoom]);
     function SetRoom(newRoom:any){
         if(room)
             unsubscribe(Socket,'/sub/talk/'+room.id);
         setRoom(newRoom)
-        subscribe(Socket,'/sub/talk/'+newRoom.id,()=>{ console.log(newRoom.id)});
+        subscribe(Socket,'/sub/talk/'+newRoom.id,(e:any)=>{ const list = JSON.parse(e.body);setRooms(list); setReplaceRoom(list.filter((r:any)=>{if(r.id==newRoom.id) return r;})[0]) });
+        const time = setInterval(()=>{
+            const element = document.getElementById('chatSpace');
+            if(element)
+                element.scrollTop = element.scrollHeight+9999;
+            clearInterval(time);
+        },10)
+        
     }
     function Profile() {
         return (
@@ -117,11 +135,11 @@ export default function Home(){
                         <label className='font-bold text-lg p-5'>메시지</label>
                         <div className='m-5'>
                             {rooms?.map((r,index)=>
-                                <div key={index} className="flex cursor-pointer" onClick={()=>SetRoom(r)}>
-                                    <img className="rounded-full" style={{width:44+'px',height:44+'px'}} src={r.roomType=='GROUP'?'/commons/group.png':(r.roomType=='SELF'?r.owner.profileImage:r.participants.filter((p:any)=>{if(p.username!= user.username) return p})[0].profileImage)} />
-                                    <div className="flex flex-col">
-                                        <label className="ml-2 font-bold cursor-pointer" onClick={()=>SetRoom(r)}>{r.roomType=='GROUP'?r.name:(r.roomType=='SELF'?r.owner.nickname : r.participants.filter((p:any)=>{if(p.username!=user.username)return p})[0].nickname)}</label>
-                                        <label className="ml-2 text-sm text-gray-400 cursor-pointer" onClick={()=>SetRoom(r)}>{Days({dateTime: r.roomType=='GROUP'? r.modifyDate : (r.roomType=='SELF'?Date():r.participants.filter((p:any)=>{if(p.username!=user.username)return p})[0].activeDate)})} 활동</label>
+                                <div key={index} className='flex cursor-pointer' onClick={()=>SetRoom(r)}>
+                                    <img className='rounded-full' style={{width:44+'px',height:44+'px'}} src={r.roomType=='GROUP'?'/commons/group.png':(r.roomType=='SELF'?r.owner.profileImage:r.participants.filter((p:any)=>{if(p.username!= user.username) return p})[0].profileImage)} />
+                                    <div className='flex flex-col'>
+                                        <label className='ml-2 font-bold cursor-pointer' onClick={()=>SetRoom(r)}>{r.roomType=='GROUP'?r.name:(r.roomType=='SELF'?r.owner.nickname : r.participants.filter((p:any)=>{if(p.username!=user.username)return p})[0].nickname)}</label>
+                                        <label className='ml-2 text-sm text-gray-400 cursor-pointer' onClick={()=>SetRoom(r)}>{Days({dateTime: r.roomType=='GROUP'? r.modifyDate : (r.roomType=='SELF'?Date():r.participants.filter((p:any)=>{if(p.username!=user.username)return p})[0].activeDate)})} 활동</label>
                                     </div>
                                 </div>
                             )}
@@ -131,7 +149,7 @@ export default function Home(){
             :status==1?
                 <div className={'bg-base-100 h-screen border-r-2 flex flex-col justify-start w-full'}>
                     <label className='p-5 text-2xl font-bold'>검색</label>
-                    <input type="text" className='input input-bordered input-accent w-full max-w-xs self-center' placeholder='검색'/>
+                    <input type='text' className='input input-bordered input-accent w-full max-w-xs self-center' placeholder='검색'/>
                     <div className='divider mt-3 mb-1'></div>
                     <div className='flex justify-between p-3'><label>최근 검색 항목</label><label className='cursor-pointer text-blue-500 hover:text-black'>모두 지우기</label></div>
                 </div>
@@ -139,7 +157,7 @@ export default function Home(){
                 <div className={'bg-base-100 h-screen border-r-2 flex flex-col justify-start w-full'}>
                     <label className='p-5 text-2xl font-bold'>알림</label>
                     <div className='flex flex-col self-center items-center w-[300px] text-sm text-center'>
-                        <img src="/commons/activity.png" style={{width:64+'px',height:64+'px'}}></img>
+                        <img src='/commons/activity.png' style={{width:64+'px',height:64+'px'}}></img>
                         <label className='p-2'>게시물 활동</label>
                         <label className='p-2'>다른 사람이 회원님의 게시물을 좋아하거나 댓글을 남기면 여기에 표시됩니다.</label>
                     </div>
@@ -149,7 +167,7 @@ export default function Home(){
     }
     function Search(e:any){
         const value = e?.value;
-        if(value){
+        if(value&&value.length !=0){
             if(searchInterval)
                 clearInterval(searchInterval);
             const timer = setInterval(() => {
@@ -172,7 +190,7 @@ export default function Home(){
             setIsCreateingRomm(true);
             createRoom({participants:[...data,user.username]}).then(response => {
                 if(isMessageModalOpen)
-                    setRoom(response);
+                    SetRoom(response);
                 setIsMessageModalOpen(false);
                 setSelectedUsers(null as unknown as any[]);
                 setSearchedUsers(null as unknown as any[]);
@@ -192,19 +210,10 @@ export default function Home(){
     function Send(){
         const text = (document.getElementById('message_text') as HTMLInputElement);
         publish(Socket, '/pub/talk/'+room.id, {sender: user.username ,message: text.value,urls: [] as String[],createDate: new Date()});
-        
-        
-        const newChat = [ ...room.chats,{sender: user, message:text.value, urls:[], createDate:new Date()}]
-        room.chats = newChat;
-        console.log(room);
-        setRoom(room);
         text.value=''; 
-
     }
-
-
     return ( 
-    <main className="flex">
+    <main className='flex'>
         <p className={'h-screen min-w-[500px]'}></p>
             <div className={'fixed sidebar h-screen flex w-[500px] z-[5]'}>
                 <div className={'h-screen border-r-2 flex flex-col justify-start w-[120px]'}>
@@ -354,78 +363,78 @@ export default function Home(){
                 </div>
                 <Extra/>
                 <Modal open={isMessageModalOpen} onClose={closeMessageModal} className='' outlineClose={true} escClose={true}>
-                    <div className="flex flex-col" style={{width:550+'px',height:600+'px'}}>
-                        <div className="flex justify-center items-center relative my-5">
-                            <label className="text-lg font-bold">새로운 메시지</label>
-                            <img src="/commons/x.png" className="fixed right-5 cursor-pointer" onClick={closeMessageModal} style={{width:18+'px',height:18+'px'}}/>
+                    <div className='flex flex-col' style={{width:550+'px',height:600+'px'}}>
+                        <div className='flex justify-center items-center relative my-5'>
+                            <label className='text-lg font-bold'>새로운 메시지</label>
+                            <img src='/commons/x.png' className='fixed right-5 cursor-pointer' onClick={closeMessageModal} style={{width:18+'px',height:18+'px'}}/>
                         </div>
-                        <div className="divider my-0"></div>
-                        <div className="flex px-4">
-                            <label className="font-bold min-w-[77px] my-1">받는 사람 : </label>
-                            <div className="flex flex-wrap w-full">
+                        <div className='divider my-0'></div>
+                        <div className='flex px-4'>
+                            <label className='font-bold min-w-[77px] my-1'>받는 사람 : </label>
+                            <div className='flex flex-wrap w-full'>
                             {selectedUsers&&selectedUsers.length>0 ?
-                                selectedUsers?.map((u,index)=> <button className="btn btn-sm btn-info px-2 mx-1 text-white hover:text-black" key={index} onClick={()=>{const newUsers= selectedUsers.filter(check=>check!=u);setSelectedUsers(newUsers) }}>{u?.username}</button>)
+                                selectedUsers?.map((u,index)=> <button className='btn btn-sm btn-info px-2 mx-1 text-white hover:text-black' key={index} onClick={()=>{const newUsers= selectedUsers.filter(check=>check!=u);setSelectedUsers(newUsers) }}>{u?.username}</button>)
                             :
                                 <></>
                             }
-                            <input id="search" type="text" className="ml-4 outline-none my-1" autoFocus placeholder="검색..." onChange={(e)=> Search(e.target)}/>
+                            <input id='search' type='text' className='ml-4 outline-none my-1' autoFocus placeholder='검색...' onChange={(e)=> Search(e.target)}/>
                             </div>
                         </div>
-                        <div className="divider my-0"></div>
-                        <div className="overflow-y-scroll" style={{width:548+'px',height:448+'px'}}>
+                        <div className='divider my-0'></div>
+                        <div className='overflow-y-scroll' style={{width:548+'px',height:448+'px'}}>
                             {searchInterval?
                                 <></>
                             :searchedUsers && searchedUsers.length!=0 ?
                                 <>{searchedUsers.map((u,index)=><div key={index}>
-                                    <div className="cursor-pointer hover:bg-base-300 flex my-2 px-5" onClick={()=>{const users = selectedUsers? selectedUsers: [] as any[]; if(!selectedUsers?.includes(u)) setSelectedUsers([...users,u]); (document.getElementById('search') as HTMLInputElement).value=''; clearInterval(searchInterval);setSearchInterval(null);setSearchedUsers(null as unknown as [])}}>
-                                        <img src={u?.profileImage} className="rounded-full my-2" style={{width:44+'px',height:44+'px'}}/>
-                                        <div className="flex flex-col justify-center mx-2">
-                                            <label className="text-sm">{u?.nickname}</label>
-                                            <label className="text-sm">{u?.username}</label>
+                                    <div className='cursor-pointer hover:bg-base-300 flex my-2 px-5' onClick={()=>{const users = selectedUsers? selectedUsers: [] as any[]; if(!selectedUsers?.includes(u)) setSelectedUsers([...users,u]); (document.getElementById('search') as HTMLInputElement).value=''; clearInterval(searchInterval);setSearchInterval(null);setSearchedUsers(null as unknown as [])}}>
+                                        <img src={u?.profileImage} className='rounded-full my-2' style={{width:44+'px',height:44+'px'}}/>
+                                        <div className='flex flex-col justify-center mx-2'>
+                                            <label className='text-sm'>{u?.nickname}</label>
+                                            <label className='text-sm'>{u?.username}</label>
                                         </div>
                                     </div>
                                 </div> )}</>
                             :
-                                <label className="mx-5 text-gray-500 text-sm">계정을 찾을 수 없습니다.</label>
+                                <label className='mx-5 text-gray-500 text-sm'>계정을 찾을 수 없습니다.</label>
                             }
                         </div>
-                        <button className="btn btn-info text-white m-4" disabled={!selectedUsers||selectedUsers.length==0} onClick={()=>CreateRoom()} > {isCreateingRomm?'생성중':'채팅'}</button>
+                        <button className='btn btn-info text-white m-4' disabled={!selectedUsers||selectedUsers.length==0} onClick={()=>CreateRoom()} > {isCreateingRomm?'생성중':'채팅'}</button>
                     </div>
                 </Modal>
             </div> 
             {status!=0?<div className={'fixed right-0 h-screen z-[5]'} style={{width:(window.innerWidth-515+'px')}} onClick={()=>setStatus(0)}></div>:null}
-        <div className="main w-full">
+        <div className='main w-full'>
         {
         !room?
-            <div className="h-full w-full flex flex-col items-center justify-center">
-                <img src="/commons/my_message.png" style={{width:96+'px',height:96+'px'}}/>
-                <label className="text-2xl p-3">내 메시지</label>
+            <div className='h-full w-full flex flex-col items-center justify-center'>
+                <img src='/commons/my_message.png' style={{width:96+'px',height:96+'px'}}/>
+                <label className='text-2xl p-3'>내 메시지</label>
                 <label>친구나 그룹에 비공개 사진과 메시지를 보내보세요</label>
-                <button className="btn btn-info text-white btn-sm m-5" onClick={()=>openMessage()}>메시지 보내기</button>
+                <button className='btn btn-info text-white btn-sm m-5' onClick={()=>openMessage()}>메시지 보내기</button>
             </div>
         :
-            <div className="flex flex-col relative" id="m_pbg">
-                <div className="ml-5 my-3 flex items-center">
-                    <img className="rounded-full" style={{width:44+'px',height:44+'px'}} src={room.roomType=='GROUP'?'/commons/group.png':(room.roomType=='SELF'?room.owner.profileImage:room.participants.filter((p:any)=>{if(p.username!= user.username) return p})[0].profileImage)} />
-                    <label className="ml-2 font-bold">{room.roomType=='GROUP'?room.name:(room.roomType=='SELF'?room.owner.nickname : room.participants.filter((p:any)=>{if(p.username!=user.username)return p})[0].nickname)}</label>
+            <div className='flex flex-col relative' id='m_pbg'>
+                <div className='ml-5 my-3 flex items-center'>
+                    <img className='rounded-full' style={{width:44+'px',height:44+'px'}} src={room.roomType=='GROUP'?'/commons/group.png':(room.roomType=='SELF'?room.owner.profileImage:room.participants.filter((p:any)=>{if(p.username!= user.username) return p})[0].profileImage)} />
+                    <label className='ml-2 font-bold'>{room.roomType=='GROUP'?room.name:(room.roomType=='SELF'?room.owner.nickname : room.participants.filter((p:any)=>{if(p.username!=user.username)return p})[0].nickname)}</label>
                 </div>
-                <div className="divider my-0"></div>
-                <div className="flex flex-col" style={{width:1400+'px',height:800+'px'}}>
+                <div className='divider my-0'></div>
+                <div id="chatSpace" className='flex flex-col overflow-y-scroll' style={{width:1400+'px',height:800+'px'}}>
                     {(room.chats as any[]).map((chat,index)=>
                         <div key={index} onClick={()=>console.log(chat)}>
                             {chat.sender.username == user.username?
-                                <div className="flex justify-end mr-2">
-                                    <div className="flex flex-col">
-                                        <label className="rounded-l-full text-lg bg-blue-500 text-white px-5">{chat.message}</label>
-                                        <label className="text-gray-500 text-sm">{GetDate({dateTime:chat.createDate})}</label>
+                                <div className='flex justify-end mr-2'>
+                                    <div className='flex flex-col'>
+                                        <label className='rounded-l-full text-lg bg-blue-500 text-white px-5'>{chat.message}</label>
+                                        <label className='text-gray-500 text-sm'>{GetDate({dateTime:chat.createDate})}</label>
                                     </div>
                                 </div>
                             :
-                                <div className="flex justify-start m-2">
-                                    <img className="rounded-full" src={chat.sender.profileImage} style={{width:44+'px',height:44+'px'}}/>
-                                    <div className="flex flex-col m-2">
-                                        <label className="rounded-full text-lg bg-blue-500 text-white px-5">{chat.message}</label>
-                                        <label className="text-gray-500 text-sm">{GetDate({dateTime:chat.createDate})}</label>
+                                <div className='flex justify-start m-2'>
+                                    <img className='rounded-full' src={chat.sender.profileImage} style={{width:44+'px',height:44+'px'}}/>
+                                    <div className='flex flex-col m-2'>
+                                        <label className='rounded-full text-lg bg-blue-500 text-white px-5'>{chat.message}</label>
+                                        <label className='text-gray-500 text-sm'>{GetDate({dateTime:chat.createDate})}</label>
                                     </div>
                                 </div>
                             }
@@ -433,10 +442,10 @@ export default function Home(){
                     )}
                 </div>
                 <EmoteDropDown input_id='message_text' open={isEmoteDropDownOpen} setIsOpen={(v:boolean)=>setIsEmoteDropDownOpen(v)} onClick={()=>{}} background='m_pbg' button='m_eb'/>
-                <div className="flex items-center rounded-full border border-black mx-4 px-4" style={{height:44+'px'}}>
-                    <EmoteButton className="w-[24px] h-[24px]" id="m_eb" open={isEmoteDropDownOpen} setIsOpen={setIsEmoteDropDownOpen}/>
-                    <textarea autoFocus id="message_text" className="outline-none ml-2 break-words w-full resize-none" rows={1} placeholder="메시지 입력..." />
-                    <label className="min-w-[55px] h-[18px] text-blue-500 hover:text-black cursor-pointer" onClick={Send }>보내기</label>
+                <div className='flex items-center rounded-full border border-black mx-4 px-4' style={{height:44+'px'}}>
+                    <EmoteButton className='w-[24px] h-[24px]' id='m_eb' open={isEmoteDropDownOpen} setIsOpen={setIsEmoteDropDownOpen}/>
+                    <textarea autoFocus id='message_text' className='outline-none ml-2 break-words w-full resize-none' rows={1} placeholder='메시지 입력...' />
+                    <label className='min-w-[55px] h-[18px] text-blue-500 hover:text-black cursor-pointer' onClick={Send }>보내기</label>
                 </div>
             </div>
         }
