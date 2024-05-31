@@ -9,4 +9,5 @@ public interface UserCustomRepository {
     Optional<SiteUser> find(String value);
     List<SiteUser> list(String like,String username);
 
+    List<SiteUser> recentList(String username);
 }

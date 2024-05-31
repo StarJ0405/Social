@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { fetchUser,saveArticleTempImage,writeArticle } from '@/app/api/UserAPI';
 import Modal from '@/app/global/Modal'
 import {EmoteDropDown,EmoteButton} from '@/app/global/Emotes'
+import { fetchnonUsers } from '../API/NonUserAPI';
 
 
 
@@ -24,6 +25,8 @@ export default function Sidebar(){
     const [preventComment, setPreventComment] = useState(false);
     const [isOpen,setIsOpen] = useState(false);
     const [content, setContent] = useState('');
+    const [sideSearchedUsers,setSideSearchedUsers] = useState(null as unknown as any[]);
+    const [sideSearchInterval,setSideSearchInterval] = useState(null as any);
     useEffect(() => {
         if (ACCESS_TOKEN) {
             fetchUser()
@@ -94,26 +97,24 @@ export default function Sidebar(){
         else
             return <span className='pl-3'>{name}</span>;
     }
-    function Extra(){
-        return (
-            status==1?
-                <div className={'bg-base-100 h-screen border-r-2 flex flex-col justify-start w-full'}>
-                    <label className='p-5 text-2xl font-bold'>검색</label>
-                    <input type="text" className='input input-bordered input-accent w-full max-w-xs self-center' placeholder='검색'/>
-                    <div className='divider mt-3 mb-1'></div>
-                    <div className='flex justify-between p-3'><label>최근 검색 항목</label><label className='cursor-pointer text-blue-500 hover:text-black'>모두 지우기</label></div>
-                </div>
-            :status==2?
-                <div className={'bg-base-100 h-screen border-r-2 flex flex-col justify-start w-full'}>
-                    <label className='p-5 text-2xl font-bold'>알림</label>
-                    <div className='flex flex-col self-center items-center w-[300px] text-sm text-center'>
-                        <img src="/commons/activity.png" style={{width:64+'px',height:64+'px'}}></img>
-                        <label className='p-2'>게시물 활동</label>
-                        <label className='p-2'>다른 사람이 회원님의 게시물을 좋아하거나 댓글을 남기면 여기에 표시됩니다.</label>
-                    </div>
-                </div>
-            :
-                <></>);        
+    function SideSearch(e:any){
+        const value = e?.value;
+        if(value && value.length!=0){
+            if(sideSearchInterval)
+                clearInterval(sideSearchInterval);
+            const timer = setInterval(()=> {
+                fetchnonUsers(value,user.username).then(response=>{
+                    setSideSearchedUsers(response);
+                    setSideSearchInterval(null);
+                }).catch(error=>{console.log(error); setSideSearchInterval(null);})
+                clearInterval(timer);
+            },3000);
+            setSideSearchInterval(timer);
+        }else{
+            clearInterval(sideSearchInterval);
+            setSideSearchInterval(null);
+            setSideSearchedUsers(null as unknown as any[]);
+        }
     }
 
    
@@ -290,7 +291,41 @@ export default function Sidebar(){
                 </div>
                 <More />
             </div>
-            <Extra/>
+            {status==1?
+                <div className={'bg-base-100 h-screen border-r-2 flex flex-col justify-start w-full'}>
+                    <label className='p-5 text-2xl font-bold'>검색</label>
+                    <input id="side_search" type="text" className='input input-bordered input-accent w-full max-w-xs self-center' placeholder='검색' onChange={(e)=>SideSearch(e.target)}/>
+                    <div className='divider mt-3 mb-1'></div>
+                    <div className='overflow-y-scroll h-full'>
+                        {sideSearchInterval?
+                            <></>
+                        :sideSearchedUsers && sideSearchedUsers.length!=0?
+                            <>{sideSearchedUsers.map((u,index)=>
+                                <div key={index} className='cursor-pointer hover:bg-base-300 flex my-2 px-5' onClick={()=>location.href="/"+u?.username}>
+                                    <img src={u?.profileImage} className='rounded-full my-2' style={{width:44+'px',height:44+'px'}}/>
+                                    <div className='flex flex-col justify-center mx-2'>
+                                        <label className='text-sm cursor-pointer'>{u?.nickname}</label>
+                                        <label className='text-sm cursor-pointer'>{u?.username}</label>
+                                    </div>
+                                </div>
+                            )}</>
+                        :
+                            <label className='mx-5 text-gray-500 text-sm'>계정을 찾을 수 없습니다.</label>
+                        }
+                    </div>
+                </div>
+            :status==2?
+                <div className={'bg-base-100 h-screen border-r-2 flex flex-col justify-start w-full'}>
+                    <label className='p-5 text-2xl font-bold'>알림</label>
+                    <div className='flex flex-col self-center items-center w-[300px] text-sm text-center'>
+                        <img src="/commons/activity.png" style={{width:64+'px',height:64+'px'}}></img>
+                        <label className='p-2'>게시물 활동</label>
+                        <label className='p-2'>다른 사람이 회원님의 게시물을 좋아하거나 댓글을 남기면 여기에 표시됩니다.</label>
+                    </div>
+                </div>
+            :
+                <></>
+            }
         </div>
         {status!=0?<div className={'fixed right-0 h-screen z-[5]'} style={{width:(window.innerWidth-515+'px')}} onClick={()=>setStatus(0)}></div>:null}
     </>);

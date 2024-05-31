@@ -1,5 +1,6 @@
 package com.StarJ.Social.Repositories.Customs.CustomImpls;
 
+import com.StarJ.Social.Domains.QFollow;
 import com.StarJ.Social.Domains.QSiteUser;
 import com.StarJ.Social.Domains.SiteUser;
 import com.StarJ.Social.Repositories.Customs.UserCustomRepository;
@@ -13,7 +14,7 @@ import java.util.Optional;
 public class UserCustomRepositoryImpl implements UserCustomRepository {
     private final JPAQueryFactory jpaQueryFactory;
     QSiteUser qSiteUser = QSiteUser.siteUser;
-
+    QFollow qFollow = QFollow.follow;
     @Override
     public Optional<SiteUser> find(String value) {
         return Optional.ofNullable(jpaQueryFactory
@@ -37,7 +38,11 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
                 list.addAll(check.subList(0, max));
             }
         }
-
         return list;
+    }
+
+    @Override
+    public List<SiteUser> recentList(String username) {
+        return jpaQueryFactory.selectDistinct(qSiteUser).from(qSiteUser).leftJoin(qFollow).on(qFollow.user.eq(qSiteUser)).where((qSiteUser.username.eq(username).not()).and(qFollow.follower.isNull().or(qFollow.follower.username.eq(username).not()))).orderBy(qSiteUser.activeDate.desc()).limit(10).fetch();
     }
 }

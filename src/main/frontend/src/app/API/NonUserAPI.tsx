@@ -29,3 +29,10 @@ export const fetchnonUsers = async(like : string, username : string) => {
     }});
     return response.data ;
 }
+export const fetchnonRecentUsers = async(username : string) => {
+    const response = await NonUserApi.get('/api/user/recent',{headers: {
+        'NotInclude': username
+    }});
+    return response.data ;
+}
+

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export function getAPI(){
     const api = axios.create({
-        baseURL: 'http://localhost:3000',
+        baseURL: 'http://www.starj.o-r.kr',
         headers: {
             'Content-Type': 'application/json',
         },

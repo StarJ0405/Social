@@ -32,6 +32,15 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.OK).body(null);
         }
     }
+    @GetMapping("/recent")
+    public ResponseEntity<?> recent(@RequestHeader("NotInclude")String username) {
+        try {
+            List<UserResponseDTO> userResponseDtos = this.multiService.getRecentUserResponseDTOs(username);
+            return ResponseEntity.status(HttpStatus.OK).body(userResponseDtos);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.status(HttpStatus.OK).body(null);
+        }
+    }
     @GetMapping("/data")
     public ResponseEntity<?> get(@RequestHeader("Username") String username) {
         try {

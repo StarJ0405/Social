@@ -109,6 +109,12 @@ public class MultiService {
             list.add(getUserResponseDTO(user));
         return list;
     }
+    public List<UserResponseDTO> getRecentUserResponseDTOs(String username) {
+        List<UserResponseDTO> list = new ArrayList<>();
+        for (SiteUser user : userService.getRecentList(username))
+            list.add(getUserResponseDTO(user));
+        return list;
+    }
 
     public UserResponseDTO getUserResponseDTO(SiteUser user) {
         return UserResponseDTO                                                                    //
@@ -141,7 +147,7 @@ public class MultiService {
             String key = LocalFileKeywords.profileImage.getValue(username);
             localFileService.deleteWithFile(key);
             String path = SocialApplication.getOS_TYPE().getPath();
-            String filename = "/users/" + username + "/" + UUID.randomUUID().toString() + "." + image.getContentType().split("/")[1];
+            String filename = "/api/users/" + username + "/" + UUID.randomUUID().toString() + "." + image.getContentType().split("/")[1];
             File file = new File(path + filename);
             if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
             image.transferTo(file);
@@ -173,7 +179,7 @@ public class MultiService {
             if (localFile != null) {
                 String path = SocialApplication.getOS_TYPE().getPath();
                 String preV = localFile.getV();
-                String newV = "/articles/" + article.getId().toString() + "/" + UUID.randomUUID().toString() + "." + preV.split("\\.")[1];
+                String newV = "/api/articles/" + article.getId().toString() + "/" + UUID.randomUUID().toString() + "." + preV.split("\\.")[1];
                 File file = new File(path + newV);
                 if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
                 Files.move(Paths.get(path + preV), Paths.get(path + newV), StandardCopyOption.REPLACE_EXISTING);
@@ -218,7 +224,7 @@ public class MultiService {
             String key = LocalFileKeywords.articleTempImage.getValue(username);
             localFileService.deleteWithFile(key);
             String path = SocialApplication.getOS_TYPE().getPath();
-            String filename = "/users/" + username + "/" + UUID.randomUUID().toString() + "." + image.getContentType().split("/")[1];
+            String filename = "/api/users/" + username + "/" + UUID.randomUUID().toString() + "." + image.getContentType().split("/")[1];
             File file = new File(path + filename);
             if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
             image.transferTo(file);
@@ -366,7 +372,7 @@ public class MultiService {
             String key = LocalFileKeywords.messageTempImage.getValue(room_id.toString());
             localFileService.deleteWithFile(key);
             String path = SocialApplication.getOS_TYPE().getPath();
-            String filename = "/users/" + "username" + "/" + UUID.randomUUID().toString() + "." //+ image.getContentType().split("/")[1];
+            String filename = "/api/users/" + "username" + "/" + UUID.randomUUID().toString() + "." //+ image.getContentType().split("/")[1];
                     ;
             File file = new File(path + filename);
             if (!file.getParentFile().exists()) file.getParentFile().mkdirs();

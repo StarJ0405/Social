@@ -3,9 +3,9 @@ package com.StarJ.Social.Enums;
 import lombok.Getter;
 
 public enum OSType {
-     Window("C:/web/Social/frontend/public"),
+     Window("C:/web/social"),
 //    Window("C:/Users/admin/IdeaProjects/Social/src/main/frontend/public"), //
-    Linux("/home/ubuntu/Social/frontend/public"), //
+    Linux("/home/ubuntu/social/data"), //
     //
     ;
     @Getter
