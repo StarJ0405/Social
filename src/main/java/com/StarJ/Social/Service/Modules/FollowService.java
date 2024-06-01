@@ -24,15 +24,15 @@ public class FollowService {
     public Optional<Follow> getOptional(SiteUser user, SiteUser follower){
         return followRepository.get(user.getUsername(),follower.getUsername());
     }
-    public List<FollowResponseDTO> getFollowers(SiteUser user) {
-        return followRepository.getFollowers(user.getUsername()).stream().map(f -> f.toDTO()).toList();
+    public List<Follow> getFollowers(SiteUser user) {
+        return followRepository.getFollowers(user.getUsername());
     }
 
-    public List<FollowResponseDTO> getFollowings(SiteUser user) {
-        return followRepository.getFollowing(user.getUsername()).stream().map(f -> f.toDTO()).toList();
+    public List<Follow> getFollowings(SiteUser user) {
+        return followRepository.getFollowing(user.getUsername());
     }
-    public List<FollowResponseDTO> getBothFollower(SiteUser user){
-        return followRepository.getBothFollow(user.getUsername()).stream().map(f -> f.toDTO()).toList();
+    public List<Follow> getBothFollower(SiteUser user){
+        return followRepository.getBothFollow(user.getUsername());
     }
     @Transactional
     public void delete(Follow follow){

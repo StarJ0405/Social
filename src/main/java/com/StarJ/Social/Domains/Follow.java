@@ -27,8 +27,9 @@ public class Follow {
         this.follower = follower;
         this.createDate = LocalDateTime.now();
     }
-    public FollowResponseDTO toDTO() {
-        return FollowResponseDTO.builder().follow(this).build();
+
+    public FollowResponseDTO toDTO(LocalFile user_image, LocalFile follower_image) {
+        return FollowResponseDTO.builder().follow(this).user_image(user_image != null ? user_image.getV() : null).follower_image(follower_image != null ? follower_image.getV() : null).build();
     }
 
 }

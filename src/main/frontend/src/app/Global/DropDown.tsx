@@ -19,7 +19,6 @@ export enum Direcion{
 const DropDown = (props:DropProps ) => {
     if(!props.open)
         return null;
-    
     let direction = props.defaultDriection;
     const x= props.x?props.x:0;
     const y= props.y?props.y:0;
@@ -30,25 +29,24 @@ const DropDown = (props:DropProps ) => {
     if(background&&button)
         switch(direction){
             case Direcion.UP:{
-                position= {top:button.y-background.y-props.height-button.height/2- y, left:x} 
+                position= {top:button.y-background.y-props.height-button.height/2- y, left:x, width:props.width+'px', height:props.height+'px'} 
             }
             break;
             case Direcion.DOWN:{
-                position= {top:button.y-background.y+button.height-y, left:x} 
+                position= {top:button.y-background.y+button.height-y, left:x, width:props.width+'px', height:props.height+'px'} 
             }
             break;
             case Direcion.LEFT:{
-                position= {left: button.x-background.x-props.width+x, top : button.y-background.y-button.height-y} 
+                position= {left: button.x-background.x-props.width+x, top : button.y-background.y-button.height-y, width:props.width+'px', height:props.height+'px'} 
             }
             break;
             case Direcion.RIGHT:{
-                position= {left: button.x-background.x+button.width+x, top : button.y-background.y-button.height-y} 
+                position= {left: button.x-background.x+button.width+x, top : button.y-background.y-button.height-y, width:props.width+'px', height:props.height+'px'} 
             }
             break;
         }
-    
 
-    return (<div className={'p-2 shadow menu dropdown-content absolute z-[10] ' +props.className+' w-['+props.width+'px] h-['+props.height+'px]'} style={position}>
+    return (<div className={'p-2 shadow menu dropdown-content absolute z-[10] ' +props.className} style={position}>
            {props.children}
   </div>);
 };

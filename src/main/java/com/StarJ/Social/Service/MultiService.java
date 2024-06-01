@@ -117,6 +117,15 @@ public class MultiService {
     }
 
     public UserResponseDTO getUserResponseDTO(SiteUser user) {
+        List<FollowResponseDTO> followers = this.followService.getFollowers(user).stream().map(f -> f.toDTO(
+                this.localFileService.getNullable(LocalFileKeywords.profileImage.getValue(f.getUser().getUsername())),
+                this.localFileService.getNullable(LocalFileKeywords.profileImage.getValue(f.getFollower().getUsername()))
+        )).toList();
+        List<FollowResponseDTO> followings = this.followService.getFollowings(user).stream().map(f->f.toDTO(
+                this.localFileService.getNullable(LocalFileKeywords.profileImage.getValue(f.getUser().getUsername())),
+                this.localFileService.getNullable(LocalFileKeywords.profileImage.getValue(f.getFollower().getUsername()))
+        )).toList();
+
         return UserResponseDTO                                                                    //
                 .builder()                                                                        //
                 .user(user)                                                                       //
@@ -125,9 +134,9 @@ public class MultiService {
                                 .profileImage                                                     //
                                 .getValue(user                                                    //
                                         .getUsername())))                                         //
-                .followers(this.followService.getFollowers(user))                                 //
-                .followings(this.followService.getFollowings(user))                               //
-                .articleCount(this.articleService.getList(user.getUsername(), 0).size())   //
+                .followers(followers)                                                             //
+                .followings(followings)                                                           //
+                .articleCount(this.articleService.getList(user.getUsername(), 0).size())    //
                 .build();                                                                         //
     }
 

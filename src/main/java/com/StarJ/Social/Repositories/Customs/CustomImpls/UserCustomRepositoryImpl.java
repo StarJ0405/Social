@@ -31,7 +31,7 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
             return list;
         else if (list.size() < 10) {
             List<SiteUser> check = jpaQueryFactory.select(qSiteUser).from(qSiteUser).where(qSiteUser.username.eq(username).not().and(qSiteUser.username.contains(like).and(qSiteUser.username.startsWith(like).not()).or(qSiteUser.nickname.contains(like)).and(qSiteUser.nickname.startsWith(like).not()))).limit(10).fetch();
-            if (check.size() > 0) {
+            if (!check.isEmpty()) {
                 int max = 10 - list.size();
                 if (max > check.size())
                     max = check.size();
@@ -43,6 +43,6 @@ public class UserCustomRepositoryImpl implements UserCustomRepository {
 
     @Override
     public List<SiteUser> recentList(String username) {
-        return jpaQueryFactory.selectDistinct(qSiteUser).from(qSiteUser).leftJoin(qFollow).on(qFollow.user.eq(qSiteUser)).where((qSiteUser.username.eq(username).not()).and(qFollow.follower.isNull().or(qFollow.follower.username.eq(username).not()))).orderBy(qSiteUser.activeDate.desc()).limit(10).fetch();
+        return jpaQueryFactory.selectDistinct(qSiteUser).from(qSiteUser).leftJoin(qFollow).on(qFollow.user.eq(qSiteUser)).where((qSiteUser.username.eq(username).not()).and(qFollow.follower.isNull().or(qFollow.follower.username.eq(username).not()))).orderBy(qSiteUser.activeDate.desc()).limit(20).fetch();
     }
 }

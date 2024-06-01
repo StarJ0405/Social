@@ -347,7 +347,7 @@ export default function Home(){
                 </div>
                 {
                     status==0?
-                    <div className='h-screen border-r-2 flex flex-col justify-start w-full bg-white'>
+                    <div className='h-screen border-r-2 flex flex-col justify-start w-full bg-base-500'>
                         <div className='flex justify-between m-8 mb-5 items-center'><label className='text-4xl font-bold'>{user?.username}</label> <img src='/commons/open_message.png' className='cursor-pointer' onClick={()=>openMessage()} style={{width:24+'px',height:24+'px'}}/></div>
                         <div className='overflow-y-scroll felx flex-col h-full'>
                             <img src={user?.profileImage} className='m-5 w-24 rounded-full' style={{width:74+'px',height:74+'px'}}/>
