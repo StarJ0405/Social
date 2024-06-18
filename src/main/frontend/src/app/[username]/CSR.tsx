@@ -53,23 +53,23 @@ function test(){
 }
 export default function CSR_PAGE(props : pageProps){
     // 변수 구역
-    const[owner,setOwner] = useState(props.serverOwner);
-    const[articleList,setArticleList] = useState(props.ServerArticleList);
+    const[owner, setOwner] = useState(props.serverOwner);
+    const[articleList, setArticleList] = useState(props.ServerArticleList);
     const[isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
-    const[user,setUser] = useState(null as any);
+    const[user, setUser] = useState(null as any);
     const[isFollower, setIsFollower] = useState(false);
     const[page, setPage]=useState(0);
-    const[size,setSize]=useState({width:1,height:1});
+    const[size, setSize]=useState({width:1,height:1});
     const[reaplacer, setReplacer]= useState(null as any);
-    const[openArticle,setOpenArticle] = useState(null as any);
+    const[openArticle, setOpenArticle] = useState(null as any);
     const[isLoading, setIsLoading] = useState(false);
-    const[over,setOver] = useState(-1);
-    const[show,setShow] = useState(0);
-    const[hoverDropDown,setHoverDropDown] = useState(null as any);
+    const[over, setOver] = useState(-1);
+    const[show, setShow] = useState(0);
+    const[hoverDropDown, setHoverDropDown] = useState(null as any);
     const[timer, setTimer] = useState(null as any);
     const[isEmoteOpen, setIsEmoteOpen] = useState(false);
-    const[submitable,setSubmitable] = useState(false);
-    const[love,setLove] = useState(null as any);
+    const[submitable, setSubmitable] = useState(false);
+    const[love, setLove] = useState(null as any);
     const[followers, setFollowers] = useState(null as unknown as any[]);
     const[followings, setFollowings] = useState(null as unknown as any[]);
     // useEffect 구역

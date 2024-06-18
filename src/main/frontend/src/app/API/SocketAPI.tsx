@@ -47,13 +47,13 @@ export function subscribe(Socket:any, destination:string, onActive:(e:any) => vo
 } 
 export function publish(Socket:any, destination:string, message: any){
     try{
-    Socket.publish({destination: destination, body: JSON.stringify(message)})
-}catch(ex){
-    const time = setInterval(()=>{
-        publish(Socket,destination,message);
-        clearInterval(time);
-    },1000);
-}
+        Socket.publish({destination: destination, body: JSON.stringify(message)})
+    }catch(ex){
+        const time = setInterval(()=>{
+            publish(Socket,destination,message);
+            clearInterval(time);
+        },1000);
+    }
 }
 
 // client.publish({ destination: '/pub/talk/1', body: JSON.stringify({
