@@ -19,8 +19,7 @@ RUN ./gradlew bootJar
 FROM ghdtjdwo126/ubuntu-preset
 WORKDIR /
 COPY --from=builder /frontend/.next/. /frontend/.next/
-# COPY --from=builder /backend/build/libs/*.jar /backend/
-COPY --from=builder /backend/. /backend/
+COPY --from=builder /backend/build/libs/*.jar /backend/
 COPY /backend/run.sh /backend/
 COPY ./frontend/run.sh /frontend/
 COPY ./frontend/public/. /frontend/public/.
