@@ -38,7 +38,7 @@ jobs:
             # sub 시작
             echo "sub start"
             sudo docker rm -f $(sudo docker ps -aqf "name=^${{secrets.DOCKERHUB_REPO}}_sub") # 컨테이너 찾아서 종료
-            sudo docker run -d -p 13103:3000 -p 18183:8080 -v /HDD/starj0405/web/food/data:/home/ubuntu/food/data --name "${{secrets.DOCKERHUB_REPO}}_sub" ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKERHUB_REPO}}:latest
+            sudo docker run -d -p 13103:3000 -p 18183:8080 -v /HDD/starj0405/web/social/data:/home/ubuntu/social/data --name "${{secrets.DOCKERHUB_REPO}}_sub" ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKERHUB_REPO}}:latest
             count=0
             while true; do
               if [[ $(curl -s localhost:18183/api/track/health) =~ "UP" ]]; then
@@ -46,7 +46,7 @@ jobs:
                 sudo iptables -t nat -A PREROUTING -p tcp --dport 13102 -j REDIRECT --to-port 13103
                 sudo iptables -t nat -A PREROUTING -p tcp --dport 18182 -j REDIRECT --to-port 18183
                 sudo docker rm -f $(sudo docker ps -aqf "name=^${{secrets.DOCKERHUB_REPO}}_main") # 컨테이너 찾아서 종료
-                sudo docker run -d -p 13102:3000 -p 18182:8080 -v /HDD/starj0405/web/food/data:/home/ubuntu/food/data --name "${{secrets.DOCKERHUB_REPO}}_main" ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKERHUB_REPO}}:latest
+                sudo docker run -d -p 13102:3000 -p 18182:8080 -v /HDD/starj0405/web/social/data:/home/ubuntu/social/data --name "${{secrets.DOCKERHUB_REPO}}_main" ${{secrets.DOCKERHUB_USERNAME}}/${{secrets.DOCKERHUB_REPO}}:latest
                 echo "sub finish main start"
                 break
               else
