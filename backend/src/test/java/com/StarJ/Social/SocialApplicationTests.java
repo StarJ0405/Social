@@ -18,6 +18,10 @@ class SocialApplicationTests {
 	char[] alphabets = "abcdefghijklmnopqrstuvwxyz".toCharArray();
 	char[] numbers = "0123456789".toCharArray();
 	@Test
+	void admin(){
+		userRepository.save(SiteUser.builder().username("admin").email("admin@naver.com").nickname("관리자").password(passwordEncoder.encode("1")).build());
+	}
+	@Test
 	void insert(){
 		Random random = new Random();
 		for (int i=0; i< 1000; i++){
