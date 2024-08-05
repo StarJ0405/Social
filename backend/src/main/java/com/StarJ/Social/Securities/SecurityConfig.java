@@ -67,6 +67,8 @@ public class SecurityConfig {
                 .oauth2Login(oauth -> oauth //
                         .loginPage("/api/user/login") // 로그인 페이지 url
                         .userInfoEndpoint(endpoint -> endpoint.userService(principalOauth2UserService)) // OAuth 가 들어오면 이 서비스로 매핑됨
+//                        .defaultSuccessUrl("http://localhost:3000?QAuth=true")
+                                .defaultSuccessUrl("http://localhost:8080/api/auth/QAuth")
                 )
                 // 로그아웃
                 .logout(logout -> logout //

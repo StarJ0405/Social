@@ -2,11 +2,12 @@ package com.StarJ.Social.Controllers;
 
 import com.StarJ.Social.DTOs.AuthRequestDTO;
 import com.StarJ.Social.DTOs.AuthResponseDTO;
-import com.StarJ.Social.Service.Modules.AuthService;
 import com.StarJ.Social.Service.MultiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -26,5 +27,11 @@ public class AuthController {
     public ResponseEntity<?> refreshToken(@RequestHeader("REFRESH_TOKEN") String refreshToken) {
         String newAccessToken = this.multiService.refreshToken(refreshToken);
         return ResponseEntity.status(HttpStatus.OK).body(newAccessToken);
+    }
+
+    @GetMapping("/QAuth")
+    public ResponseEntity<?> loginQAuth(@AuthenticationPrincipal User details) {
+        System.out.println(details.getUsername());
+        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 }
