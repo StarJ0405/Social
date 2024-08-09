@@ -1,8 +1,8 @@
 'use client'
 import Main from '@/app/Global/main';
 import { useEffect, useState } from 'react';
-import { fetchnonRecentUsers } from './API/NonUserAPI';
-import { fetchUser, follow } from './API/UserAPI';
+import { fetchnonRecentUsers } from './Global/API/NonUserAPI';
+import { fetchUser, follow } from './Global/API/UserAPI';
 import { redirect } from 'next/navigation';
 import DropDown, { Direcion } from './Global/DropDown';
 

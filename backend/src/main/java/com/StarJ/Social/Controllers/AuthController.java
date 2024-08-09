@@ -2,12 +2,11 @@ package com.StarJ.Social.Controllers;
 
 import com.StarJ.Social.DTOs.AuthRequestDTO;
 import com.StarJ.Social.DTOs.AuthResponseDTO;
+import com.StarJ.Social.DTOs.OAuthRequestDTO;
 import com.StarJ.Social.Service.MultiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -29,9 +28,9 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK).body(newAccessToken);
     }
 
-    @GetMapping("/QAuth")
-    public ResponseEntity<?> loginQAuth(@AuthenticationPrincipal User details) {
-        System.out.println(details.getUsername());
-        return ResponseEntity.status(HttpStatus.OK).body(null);
+    @PostMapping("/OAuth")
+    public ResponseEntity<?> loginQAuth(@RequestBody OAuthRequestDTO dto) {
+        AuthResponseDTO responseDTO= multiService.OauthLogin(dto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
     }
 }

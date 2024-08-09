@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +29,11 @@ public class UserService {
                 .build());                                  //
     }
 
+    public SiteUser OAuth(String username, String nickname, String email) {
+        Optional<SiteUser> _user = userRepository.findById(username);
+        return _user.orElseGet(() -> userRepository.save(SiteUser.builder().username(username).email(nickname).email(email).build()));
+    }
+
     @Transactional
     public SiteUser get(String value) {
         return this.userRepository.findById(value).orElseThrow(
@@ -38,10 +44,12 @@ public class UserService {
     public List<SiteUser> getList(String value, String username) {
         return this.userRepository.list(value, username);
     }
+
     @Transactional
     public List<SiteUser> getRecentList(String username) {
         return this.userRepository.recentList(username);
     }
+
     @Transactional
     public void update(String username, String nickname, String email, String phoneNumber, String password, String description) {
         SiteUser user = get(username);

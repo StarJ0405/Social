@@ -16,10 +16,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-        <body className={inter.className}>
-            {children}
-            <div id="global-modal"></div>
-        </body>
+      <body className={inter.className}>
+          {children}
+          <div id="global-modal"></div>
+      </body>
     </html>
   );
 }

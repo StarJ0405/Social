@@ -1,12 +1,12 @@
 'use client'
 import { InputHTMLAttributes, useEffect, useState } from 'react';
-import { createRoom, fetchUser, getRooms, saveArticleTempImage, writeArticle } from '../API/UserAPI';
+import { createRoom, fetchUser, getRooms, saveArticleTempImage, writeArticle } from '../Global/API/UserAPI';
 import { redirect } from 'next/navigation';
 import Modal from '../Global/Modal';
 import { EmoteButton, EmoteDropDown } from '../Global/Emotes';
-import { fetchnonUsers } from '../API/NonUserAPI';
+import { fetchnonUsers } from '../Global/API/NonUserAPI';
 import { Days, GetDate } from '../[username]/CSR';
-import { unsubscribe, getSocket, subscribe, publish  } from '../API/SocketAPI';
+import { unsubscribe, getSocket, subscribe, publish  } from '../Global/API/SocketAPI';
 
 
 

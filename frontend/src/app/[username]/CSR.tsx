@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Modal from "../Global/Modal";
-import { deleteProfile, fetchUser, follow, loveArticle, saveProfile, writeComment } from "../API/UserAPI";
-import { fetchArticle, fetchArticleList, fetchnonUser } from "../API/NonUserAPI";
+import { deleteProfile, fetchUser, follow, loveArticle, saveProfile, writeComment } from "../Global/API/UserAPI";
+import { fetchArticle, fetchArticleList, fetchnonUser } from "../Global/API/NonUserAPI";
 import DropDown, { Direcion } from "../Global/DropDown";
 import { EmoteButton, EmoteDropDown } from "../Global/Emotes";
 

@@ -1,5 +1,5 @@
 "use client";
-import { signUp } from '@/app/API/AuthAPI';
+import { signUp } from '@/app/Global/API/AuthAPI';
 import { Google_big, Kakao_big } from '@/app/Global/OAuth';
 import { useState } from 'react';
 
@@ -31,7 +31,7 @@ export default function Signup(){
                 <div className="w-[350px] h-[700px] border-black border flex flex-col items-center justify-center">
                     <img src="/commons/logo_big.png" className="w-[200px] h-[50px]" alt="logo_big" />
                     <label className="w-[260px] text-center m-5">친구들의 사진과 동영상을 보려면 가입하세요.</label>
-                    <Google_big />
+                    {/* <Google_big /> */}
                     <Kakao_big />
                     <div className="divider w-3/4 self-center m-2">또는</div>
                     <form onSubmit={handleSubmit}>

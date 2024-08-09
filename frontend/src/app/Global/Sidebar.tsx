@@ -1,10 +1,10 @@
 'use client';
 import { useState,useEffect } from 'react';
 import { redirect } from 'next/navigation';
-import { fetchUser,saveArticleTempImage,writeArticle } from '@/app/API/UserAPI';
+import { fetchUser,saveArticleTempImage,writeArticle } from '@/app/Global/API/UserAPI';
 import Modal from '@/app/Global/Modal'
 import {EmoteDropDown,EmoteButton} from '@/app/Global/Emotes'
-import { fetchnonUsers } from '../API/NonUserAPI';
+import { fetchnonUsers } from './API/NonUserAPI';
 
 
 
@@ -78,8 +78,6 @@ export default function Sidebar(){
             <div className='dropdown dropdown-top mt-auto'>
               <div tabIndex={0} role='button' className='btn mb-3 w-full'><svg xmlns='http://www.w3.org/2000/svg' className='h-7 w-7 m-2' fill='none' viewBox='0 0 24 24' stroke='currentColor'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth='2' d='M4 6h16M4 12h16M4 18h7' /></svg>더 보기</div>
               <ul tabIndex={0} className='dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52'>
-                <li><a>설정</a></li>
-                <li><a>모드 전환</a></li>
                 <li><a onClick={handleLogout}>로그아웃</a></li>
               </ul>
             </div>

@@ -1,4 +1,4 @@
-import { fetchArticleList, fetchnonUser } from "../API/NonUserAPI";
+import { fetchArticleList, fetchnonUser } from "../Global/API/NonUserAPI";
 import Main from "../Global/main";
 import CSR_PAGE from "./CSR";
 

@@ -9,11 +9,16 @@ import com.StarJ.Social.Securities.CustomUserDetails;
 import com.StarJ.Social.Securities.JWT.JwtTokenProvider;
 import com.StarJ.Social.Service.Modules.*;
 import com.StarJ.Social.SocialApplication;
+import com.google.gson.Gson;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -44,6 +49,10 @@ public class MultiService {
     private final MultiKeyService multiKeyService;
     //
     private final JwtTokenProvider jwtTokenProvider;
+    private final RestTemplate restTemplate;
+    private final Gson gson;
+    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
+    private String clientId;
 
     /**
      * Auth
@@ -109,6 +118,7 @@ public class MultiService {
             list.add(getUserResponseDTO(user));
         return list;
     }
+
     public List<UserResponseDTO> getRecentUserResponseDTOs(String username) {
         List<UserResponseDTO> list = new ArrayList<>();
         for (SiteUser user : userService.getRecentList(username))
@@ -121,7 +131,7 @@ public class MultiService {
                 this.localFileService.getNullable(LocalFileKeywords.profileImage.getValue(f.getUser().getUsername())),
                 this.localFileService.getNullable(LocalFileKeywords.profileImage.getValue(f.getFollower().getUsername()))
         )).toList();
-        List<FollowResponseDTO> followings = this.followService.getFollowings(user).stream().map(f->f.toDTO(
+        List<FollowResponseDTO> followings = this.followService.getFollowings(user).stream().map(f -> f.toDTO(
                 this.localFileService.getNullable(LocalFileKeywords.profileImage.getValue(f.getUser().getUsername())),
                 this.localFileService.getNullable(LocalFileKeywords.profileImage.getValue(f.getFollower().getUsername()))
         )).toList();
@@ -335,8 +345,8 @@ public class MultiService {
     public List<ChatRoomResponseDTO> saveChat(Long room_id, String sender_name, String message, String[] urls, LocalDateTime createDate) {
         List<ChatRoomResponseDTO> list = new ArrayList<>();
         List<ChatRoom> rooms = chatRoomService.getList(sender_name);
-        for(ChatRoom chatRoom : rooms) {
-            if(chatRoom.getId().equals(room_id)) {
+        for (ChatRoom chatRoom : rooms) {
+            if (chatRoom.getId().equals(room_id)) {
                 SiteUser sender = userService.get(sender_name);
                 ChatMessage chatMessage = chatMessageService.Create(chatRoom, sender, message);
                 for (String url : urls)
@@ -357,7 +367,7 @@ public class MultiService {
             participants.add(getUserResponseDTO(chatParticipant.getParticipant()));
         List<ChatResponseMessageDTO> chats = new ArrayList<>();
         for (ChatMessage message : room.getChatMessages())
-            chats.add(ChatResponseMessageDTO.builder().sender(getUserResponseDTO(message.getSender())).message(message.getMessage()).urls(message.getChatImages()==null?new String[0] :message.getChatImages().stream().map(image -> image.getUrl()).toArray(String[]::new)).createDate(message.getCreateDate()).build());
+            chats.add(ChatResponseMessageDTO.builder().sender(getUserResponseDTO(message.getSender())).message(message.getMessage()).urls(message.getChatImages() == null ? new String[0] : message.getChatImages().stream().map(image -> image.getUrl()).toArray(String[]::new)).createDate(message.getCreateDate()).build());
         return ChatRoomResponseDTO.builder().id(room.getId()).modifyDate(room.getModifyDate()).name(room.getName()).roomType(room.getRoomType()).owner(room.getOwner() == null ? null : getUserResponseDTO(room.getOwner())).participants(participants).chats(chats).build();
     }
 
@@ -396,5 +406,58 @@ public class MultiService {
 
     public ChatRoomResponseDTO getRoom(Long room_id) {
         return getRoom(chatRoomService.get(room_id));
+    }
+
+
+    public AuthResponseDTO OauthLogin(OAuthRequestDTO requestDTO) {
+        return switch (requestDTO.type()) {
+            case "kakao" -> kakaoLogin(requestDTO.code());
+            case "google" -> googleLogin(requestDTO.code());
+            default -> throw new IllegalStateException("Unexpected value: " + requestDTO.type());
+        };
+    }
+
+    public AuthResponseDTO googleLogin(String code) {
+        return null;
+    }
+
+    public AuthResponseDTO kakaoLogin(String code) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "authorization_code");
+        params.add("client_id", clientId);
+//        params.add("redirect_uri", "http://localhost:3000/account/login?type=kakao");
+        params.add("redirect_uri", "http://server.starj.kro.kr:13102/account/login?type=kakao");
+        params.add("code", code);
+
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+        ResponseEntity<String> response = restTemplate.postForEntity("https://kauth.kakao.com/oauth/token", request, String.class);
+
+        if (response.getStatusCode() == HttpStatus.OK) {
+            KakaoTokenInfoDTO tokenInfoDto = gson.fromJson(response.getBody(), KakaoTokenInfoDTO.class);
+            headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            headers.set("Authorization", "Bearer " + tokenInfoDto.access_token());
+            response = restTemplate.postForEntity("https://kapi.kakao.com/v2/user/me", new HttpEntity<>(null, headers), String.class);
+            if (response.getStatusCode() == HttpStatus.OK) {
+                KakaoInfoDTO infoDTO = gson.fromJson(response.getBody(), KakaoInfoDTO.class);
+                SiteUser user = userService.OAuth("kakao_" + infoDTO.id(), infoDTO.properties().nickname(), infoDTO.kakao_account().email());
+                String accessToken = this.jwtTokenProvider //
+                        .generateAccessToken(new UsernamePasswordAuthenticationToken(new CustomUserDetails(user), user.getPassword()));
+                String refreshToken = this.jwtTokenProvider //
+                        .generateRefreshToken(new UsernamePasswordAuthenticationToken(new CustomUserDetails(user), user.getPassword()));
+                if (this.authService.isExist(user)) {
+                    user.getAuth().setAccessToken(accessToken);
+                    user.getAuth().setRefreshToken(refreshToken);
+                    userService.updateActive(user);
+                    return new AuthResponseDTO(user.getAuth());
+                }
+                return new AuthResponseDTO(authService.save(user, accessToken, refreshToken));
+            }
+        }
+        throw new RuntimeException("error");
     }
 }
