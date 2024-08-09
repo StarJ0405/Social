@@ -21,11 +21,11 @@ UserApi.interceptors.response.use((response) => {
     return response;
 }, async (error) => {
     const originalRequest = error.config;
-    if(!originalRequest._retry)
-        if (error.response.status === 401 ) {
+    if (!originalRequest._retry)
+        if (error.response.status === 401) {
             await refreshAccessToken();
             return UserApi(originalRequest);
-        }else if (error.response.status === 403 ) {
+        } else if (error.response.status === 403) {
             localStorage.clear();
             window.location.href = `/account/login`;
             return;
@@ -47,7 +47,7 @@ export const fetchUser = async () => {
     return response.data;
 }
 /** 회원수정 API */
-export const updateUser = async (data:any) => {
+export const updateUser = async (data: any) => {
     const response = await UserApi.put(`/api/user`, data);
     return response.data;
 }
@@ -57,7 +57,7 @@ export const deleteUser = async () => {
 }
 
 /** 프로필 저장 */
-export const saveProfile = async(formData:any) =>{
+export const saveProfile = async (formData: any) => {
     const response = await UserApi.post('/api/file/profile', formData, {
         headers: {
             'Content-Type': 'multipart/form-data'
@@ -66,76 +66,88 @@ export const saveProfile = async(formData:any) =>{
     return response.data;
 }
 /** 프로필 삭제 */
-export const deleteProfile = async() =>{
-   const response = await  UserApi.delete('/api/file/profile');
-   return response.data;
-}
-/** 게시글 임시 이미지 저장 */
-export const saveArticleTempImage = async( formData:any) => {
-    const response = await UserApi.post('/api/file/temp_article',formData,{headers: {
-        'Content-Type': 'multipart/form-data'
-    }});
+export const deleteProfile = async () => {
+    const response = await UserApi.delete('/api/file/profile');
     return response.data;
 }
-/** 게시글 저장 */ 
-interface articleProps{
-    content:string;
-    tags:String[];
-    visibility:number;
-    hideLoveAndShow:boolean;
-    preventComment:boolean;
-    img_url:string;
+/** 게시글 임시 이미지 저장 */
+export const saveArticleTempImage = async (formData: any) => {
+    const response = await UserApi.post('/api/file/temp_article', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+    return response.data;
 }
-export const writeArticle = async(data:articleProps)=>{
-    const response = await UserApi.post('/api/article/write',data);
+/** 게시글 저장 */
+interface articleProps {
+    content: string;
+    tags: String[];
+    visibility: number;
+    hideLoveAndShow: boolean;
+    preventComment: boolean;
+    img_url: string;
+}
+export const writeArticle = async (data: articleProps) => {
+    const response = await UserApi.post('/api/article/write', data);
     return response.data;
 }
 
 /** 댓글 작성 */
-interface commentProps{
-    article_id:number;
-    comment:string;
+interface commentProps {
+    article_id: number;
+    comment: string;
 }
-export const writeComment = async(data:commentProps)=>{
-    const response = await UserApi.post('/api/comment/write',data);
+export const writeComment = async (data: commentProps) => {
+    const response = await UserApi.post('/api/comment/write', data);
     return response.data;
 }
-interface LoveProps{
-    article_id:number;
-    username:string;
+interface LoveProps {
+    article_id: number;
+    username: string;
 }
-export const loveArticle = async(data:LoveProps)=>{
-    const response = await UserApi.post('/api/article/love',data);
+export const loveArticle = async (data: LoveProps) => {
+    const response = await UserApi.post('/api/article/love', data);
     return response.data;
 }
-interface FollwoProps{
-    username:string;
-    follower:string;
+interface FollwoProps {
+    username: string;
+    follower: string;
 }
-export const follow = async(data:FollwoProps)=>{
-    const response = await UserApi.post('/api/user/follow',data);
+export const follow = async (data: FollwoProps) => {
+    const response = await UserApi.post('/api/user/follow', data);
     return response.data;
 }
-interface CreateRoomPorps{
-    participants:string[];
+interface CreateRoomPorps {
+    participants: string[];
 }
-export const createRoom = async(data:CreateRoomPorps)=>{
-    const response = await UserApi.post('/api/chat/createRoom',data);
+export const createRoom = async (data: CreateRoomPorps) => {
+    const response = await UserApi.post('/api/chat/createRoom', data);
     return response.data;
 }
-interface RoomsProps{
-    username:string;
+interface RoomsProps {
+    username: string;
 }
-export const getRooms = async(data:RoomsProps)=>{
+export const getRooms = async (data: RoomsProps) => {
     const response = await UserApi.get('/api/chat/rooms');
     return response.data;
 }
-interface RoomProps{
-    room_id:number
+interface RoomProps {
+    room_id: number
 }
-export const getRoom = async(data:RoomProps)=>{
-    const response = await UserApi.get('/api/room',{headers: {
-        'RoomId': data.room_id
-    }});
+export const getRoom = async (data: RoomProps) => {
+    const response = await UserApi.get('/api/room', {
+        headers: {
+            'RoomId': data.room_id
+        }
+    });
+    return response.data;
+}
+export const getAlarms = async () => {
+    const response = await UserApi.get(`/api/alarm`);
+    return response.data;
+}
+export const deleteAlarm = async (data: { id: number }) => {
+    const response = await UserApi.delete(`/api/alarm`, { headers: data });
     return response.data;
 }

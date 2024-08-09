@@ -16,6 +16,13 @@ export const fetchArticleList = async({username , page}:{username:string,page:nu
     }});
     return response.data;
 }
+export const fetchExplore = async({username , page}:{username:string,page:number}) => {
+    const response = await NonUserApi.get(`/api/article/explore`,{headers: {
+        'Username': username,
+        'Page': page,
+    }});
+    return response.data;
+}
 
 export const fetchnonUser = async(username : string) => {
     const response = await NonUserApi.get('/api/user/data',{headers: {

@@ -4,7 +4,6 @@ import com.StarJ.Social.DTOs.ArticleRequestDTO;
 import com.StarJ.Social.DTOs.ArticleResponseDTO;
 import com.StarJ.Social.DTOs.LoveRequestDTO;
 import com.StarJ.Social.Domains.Article;
-import com.StarJ.Social.Domains.Love;
 import com.StarJ.Social.Records.TokenRecord;
 import com.StarJ.Social.Service.MultiService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,7 @@ public class ArticleController {
     private final MultiService multiService;
 
     @GetMapping
-    public ResponseEntity get(@RequestHeader("ArticleID") Long article_id) {
+    public ResponseEntity<?> get(@RequestHeader("ArticleID") Long article_id) {
         ArticleResponseDTO articleRequestDTO = multiService.getArticleResponseDTO(article_id);
         return ResponseEntity.status(HttpStatus.OK).body(articleRequestDTO);
     }
@@ -37,6 +36,11 @@ public class ArticleController {
     @GetMapping("/list")
     public ResponseEntity<?> getList(@RequestHeader("Username") String username, @RequestHeader("Page") Long page) {
         return ResponseEntity.status(HttpStatus.OK).body(multiService.getDatas(username,page));
+    }
+
+    @GetMapping("/explore")
+    public ResponseEntity<?> getExplore(@RequestHeader("Username") String username, @RequestHeader("Page") Long page) {
+        return ResponseEntity.status(HttpStatus.OK).body(multiService.getExplore(username,page));
     }
 
     @PostMapping("/love")

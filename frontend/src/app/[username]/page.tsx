@@ -3,9 +3,10 @@ import Main from "../Global/main";
 import CSR_PAGE from "./CSR";
 
 
-export default async function Home({ params }: { params: any }) {
+export default async function Home({ params, searchParams }: { params: any, searchParams: any }) {
     const owner = await fetchnonUser(params.username);
-return <Main>
+    const id = searchParams?.id;
+    return <Main>
         <div className="w-full h-full flex flex-col items-center justify-start">
             <div className='w-[60%]'>
                 {!owner ?
@@ -14,7 +15,7 @@ return <Main>
                         <label className="m-5">클릭하신 링크가 잘못되었거나 페이지가 삭제되었습니다. <a href="/" className="text-blue-500">Social으로 돌아가기</a></label>
                     </div>
                     :
-                    <CSR_PAGE serverOwner={owner} ServerArticleList={await fetchArticleList({ username: owner.username, page: 0 })} />
+                    <CSR_PAGE serverOwner={owner} id={id} ServerArticleList={await fetchArticleList({ username: owner.username, page: 0 })} />
                 }
             </div>
         </div>

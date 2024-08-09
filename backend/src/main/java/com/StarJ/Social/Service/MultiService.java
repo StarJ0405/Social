@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -47,6 +48,7 @@ public class MultiService {
     private final ChatMessageService chatMessageService;
     private final ChatImageService chatImageService;
     private final MultiKeyService multiKeyService;
+    private final AlarmService alarmService;
     //
     private final JwtTokenProvider jwtTokenProvider;
     private final RestTemplate restTemplate;
@@ -237,6 +239,10 @@ public class MultiService {
         return list;
     }
 
+    public List<ArticleResponseDTO> getExplore(String username, Long page) {
+        return this.articleService.getExplore(username, page).stream().map(this::getArticleResponseDTO).toList();
+    }
+
     @Transactional
     public String saveArticleTempImage(String username, MultipartFile image) {
         try {
@@ -267,6 +273,8 @@ public class MultiService {
     public Comment write(String username, CommentRequestDTO commentRequestDTO) {
         SiteUser user = userService.get(username);
         Article article = articleService.get(commentRequestDTO.getArticle_id());
+        if (!user.getUsername().equals(article.getAuthor().getUsername()))
+            alarmService.save(article.getAuthor(), "article." + article.getId(), "내 게시물에 댓글이 달렸습니다.", "/admin/?id=" + article.getId());
         return commentService.save(user, commentRequestDTO, article);
     }
 
@@ -296,6 +304,7 @@ public class MultiService {
             followService.delete(_follow.get());
             return false;
         } else {
+            alarmService.save(user, follower.getUsername(), follower.getUsername() + "님이 당신을 팔로우했습니다.", "");
             followService.save(user, follower);
             return true;
         }
@@ -460,4 +469,19 @@ public class MultiService {
         }
         throw new RuntimeException("error");
     }
+
+    public List<AlarmResponseDTO> getAlarms(String username) {
+        return alarmService.getList(username).stream().map(this::getAlarmDTO).toList();
+    }
+
+    public List<AlarmResponseDTO> deleteAlarm(String username, Long id) {
+        alarmService.delete(id);
+        return getAlarms(username);
+    }
+
+    private AlarmResponseDTO getAlarmDTO(Alarm alarm) {
+        return AlarmResponseDTO.builder().id(alarm.getId()).message(alarm.getMessage()).link(alarm.getLink()).createDate(alarm.getCreateDate().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()).build();
+    }
+
+
 }

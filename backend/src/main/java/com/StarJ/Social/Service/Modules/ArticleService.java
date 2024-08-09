@@ -29,4 +29,7 @@ public class ArticleService {
     public List<Article> getList(String username, long page){
         return articleRepository.getListByUsername(username,page);
     }
+    public List<Article> getExplore(String username, long page){
+        return articleRepository.getExplore(username,page);
+    }
 }

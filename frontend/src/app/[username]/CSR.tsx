@@ -10,6 +10,7 @@ import { EmoteButton, EmoteDropDown } from "../Global/Emotes";
 interface pageProps {
     serverOwner:any;
     ServerArticleList:any[];
+    id?: number;
 }
 async function upload(e:any,setIsAvatarModalOpen:(status:boolean)=>void){
     const formData = new FormData();
@@ -83,6 +84,9 @@ export default function CSR_PAGE(props : pageProps){
         if(typeof window !== 'undefined'){
             if(localStorage.getItem(owner.username+'articleList'))
                 setArticleList(JSON.parse(localStorage.getItem(owner.username+'articleList') as string));
+        }
+        if(props.id){
+            fetchArticle({article_id:props.id}).then(r=>setOpenArticle(r)).catch(e=>console.log(e));
         }
     }
     ,[]);

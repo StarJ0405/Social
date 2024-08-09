@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { login, OAuth } from "@/app/Global/API/AuthAPI";
 import { Google_small, Kakao_small } from "@/app/Global/OAuth";
 import { redirect, useSearchParams } from 'next/navigation';
@@ -19,12 +19,12 @@ export default function Login() {
                 window.location.href = `/`;
             }).catch(e => {
                 console.log(e);
-                window.location.href="/";
+                window.location.href = "/";
             });
 
         }
     }, [type, code])
-    const [screenNumber, setScreenNumber] = useState(0);
+    const screenNumber = useRef(0);
     const [values, setValues] = useState({
         username: "",
         password: "",
@@ -48,37 +48,26 @@ export default function Login() {
                 console.log(error);
             });
     }
-    function ScreenList() {
-        const create = () => {
-            const result = [];
-            for (let i = 0; i <= 9; i++) {
-                //                  result.push(<Screen key={i} num={i} />);
-                result.push(<img key={i} className={"z-1 absolute transition-opacity duration-1000 ease-in left-[8.8%] top-[10.5%] w-[284px] h-[450px] " + (i != 0 ? "opacity-0" : "")} id={'screen' + i} src={"/commons/screen" + i + ".png"} alt="screen" />);
-            }
-            return result;
-        };
-        return (<div>{create()}</div>);
-    }
-
     useEffect(() => {
         const timer = setInterval(() => {
             const pre = document.getElementById('screen' + screenNumber);
             if (pre)
                 pre.classList.add('opacity-0');
-            const number = (screenNumber + 1) % 10;
+            const number = (screenNumber.current + 1) % 10;
             const now = document.getElementById('screen' + number);
             if (now)
                 now.classList.remove('opacity-0');
-            setScreenNumber(number);
-            clearInterval(timer);
+            screenNumber.current = number;
         }, 4000);
+        return () => clearInterval(timer);
     }, [screenNumber]);
     return (
         <div className="h-screen w-full flex items-center">
             <div className="w-full h-4/5 flex justify-center items-center">
                 <div className="relative">
                     <img src="/commons/phone.png" className="w-[340px] h-[580px]" alt="phone" />
-                    <ScreenList />
+                    {/* <ScreenList /> */}
+                    {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => <img key={i} className={"z-1 absolute transition-opacity duration-1000 ease-in left-[8.8%] top-[10.5%] w-[284px] h-[450px] " + (screenNumber.current != i ? "opacity-0" : "")} id={'screen' + i} src={"/commons/screen" + i + ".png"} alt="screen" />)}
                 </div>
                 <div className="w-[380px] h-[580px] m-10">
                     <div className="border border-black w-full h-4/5 mb-5 flex flex-col items-center justify-center">
@@ -97,7 +86,7 @@ export default function Login() {
                         <div className="divider w-3/4 self-center m-2">또는</div>
                         {/* <Google_small /> */}
                         <Kakao_small />
-                        <a href="/account/findPW" className="m-5">비밀번호를 잊으셨나요?</a>
+                        {/* <a href="/account/findPW" className="m-5">비밀번호를 잊으셨나요?</a> */}
                     </div>
                     <div className="border border-black w-full h-[10%] flex justify-center items-center">
                         <label>계정이 없으신가요? <a href="/account/signup" className="text-blue-500">가입하기</a></label>
