@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    reactStrictMode: false,
+	experimental: {
+		missingSuspenseWithCSRBailout: false,
+	},
+	reactStrictMode: false,
 	eslint: {
 		ignoreDuringBuilds: true,
 	},
@@ -29,7 +32,7 @@ const nextConfig = {
 			{
 				source: '/api/:path*',
 				// destination: 'http://localhost:8080/api/:path*'
-				 destination: 'http://server.starj.kro.kr:18182/api/:path*'
+				destination: 'http://server.starj.kro.kr:18182/api/:path*'
 			}
 		]
 	},
