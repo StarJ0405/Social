@@ -48,10 +48,11 @@ export default function Home() {
         window.addEventListener('scroll', scroll);
         return () => window.removeEventListener('scroll', scroll);
     })
+    console.log(explores)
     return <Main>
         <div className="flex flex-col items-center">
-            {explores.map((explore, index) => <div key={index} className="flex border-2 m-4 w-[600px] h-[300px]">
-                <img src={explore.img_url} className="w-[300px]" />
+            {explores.map((explore, index) => <div key={index} className="flex border-2 m-4 w-[600px] h-[300px] cursor-pointer" onClick={()=>{}}>
+                <img src={explore.img_url} className="w-[300px] cursor-pointer" />
                 <div className="p-4 border-l-2 flex flex-col w-[300px]">
                     <div className="h-[200px]">
                         {explore.content}
